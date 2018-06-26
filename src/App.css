@@ -1,0 +1,125 @@
+.App {
+  
+}
+
+
+
+.home, .section {
+  text-align: center;
+  padding: 16px 0;
+  border-top: 1px solid #DDD;  
+}
+
+
+
+.home h1 {
+  padding: 12px 0;
+}
+
+.App {
+  background: #FFF;
+  font-family: HelveticaNeue, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #2c3e50;
+  width: 100%;
+  height: 100%;
+  max-width: 720px;
+  margin: auto;
+  position: relative;
+  overflow-x: hidden;
+  opacity: 1;
+}
+
+.container {
+  max-width: 720px !important;
+}
+
+.slide-leave-active,
+.slide-enter-active {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 720px;
+  transition: .2s;
+}
+.slide-enter {
+  transform: translate(100%, 0);
+}
+.slide-leave-to {
+  transform: translate(-100%, 0);
+  opacity: 0;
+}
+
+.list-group {
+  margin-bottom: 12px;
+}
+
+
+.clickable {
+  cursor: pointer;
+}
+
+.list-group-item.clickable:hover {
+  background-color: #bbced3;
+}
+
+.spacer { 
+  margin: 8px auto;
+ }
+.spacerLg { 
+  margin: 16px auto;
+ }
+
+.fixed {
+  position: fixed;
+  padding: 16px;
+  width: 100%;
+  max-width: 720px;
+  bottom: 0px;
+  border-top: 1px solid #AAA;
+  overflow: hidden;
+}
+
+.right-align {
+  text-align: right
+}
+.left-align {
+  text-align: left
+}
+.center-align {
+  text-align: center
+}
+
+.newRound {
+  text-align: center;
+  padding-top: 12px;
+}
+
+.newRound h2 {
+  margin-bottom: 24px;
+}
+
+.newRound .section {
+  padding: 16px 0;
+  border-top: 1px solid #DDD;
+}
+
+#startHole {
+  max-width: 60px;
+  display: inline-block;
+}
+
+h3 {
+  padding: 16px 0;
+  text-align: center;
+}
+
+.addPlayer  {
+  padding: 16px 16px 4px 6px;
+  cursor: pointer;
+}
