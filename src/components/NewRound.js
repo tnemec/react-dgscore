@@ -14,9 +14,9 @@ import { Button, Grid, Col, Row } from 'react-bootstrap';
 
     return (
         <Row className="section">
-          <Col md="3"><strong>Players:</strong></Col>
-          <Col md="6">{playerList}</Col>
-          <Col md="3"><Button click="selectPlayer" bsStyle="link" bsSize="lg" href="/players">{addEditText}</Button></Col>
+          <Col md={3}><strong>Players:</strong></Col>
+          <Col md={6}>{playerList}</Col>
+          <Col md={3}><Button click="selectPlayer" bsStyle="link" bsSize="lg" href="/players">{addEditText}</Button></Col>
         </Row>
     );
   };
@@ -25,9 +25,9 @@ import { Button, Grid, Col, Row } from 'react-bootstrap';
 
     return (
             <Row className="section">
-              <Col md="3"><strong>Course:</strong></Col>
-              <Col md="6"><p>{props.course.name}</p></Col>
-              <Col md="3"><Button click="selectCourse" bsStyle="link" bsSize="lg" href="/course">Select Course</Button></Col>
+              <Col md={3}><strong>Course:</strong></Col>
+              <Col md={6}><p>{props.course.name}</p></Col>
+              <Col md={3}><Button click="selectCourse" bsStyle="link" bsSize="lg" href="/course">Select Course</Button></Col>
             </Row>
     );
   };
@@ -59,8 +59,9 @@ class NewRound extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  players: state.round.players,
-  course: state.round.course
+  state: state,
+  players: state.newround.players,
+  course: state.newround.course
 })
 
 export default connect(mapStateToProps)(NewRound);

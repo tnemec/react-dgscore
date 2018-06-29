@@ -29,19 +29,20 @@ const initialState = {
     savedPlayers : [
 		{name: 'Steve', uid: 101, img: '', icon: ''}, 
 		{name: 'Andrew', uid: 102, img: '', icon: ''}, 
-	],
-	tempPlayers : []
+	]
 };
-
 
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case 'INCREMENT':
-      return state + 1
-    case 'DECREMENT':
-      return state - 1
+    case 'NEWROUND_PLAYERS': // replace newround.players array
+    	let newRound = Object.assign({}, state.newround, {players: action.payload});
+    	return Object.assign({}, state, { newround : newRound });
+
+    case 'SAVE_PLAYER': // add player to saved players list
+    	return Object.assign({}, state, {savedPlayers: state.savedPlayers.concat(action.payload)});
+
     default:
-      return state
+    	return state
   }
 }

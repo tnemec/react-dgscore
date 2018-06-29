@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { Button, Grid, Col, Row, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { Button, Grid, Col, Row, ListGroup, ListGroupItem, Modal, Form, ControlLabel, FormGroup, FormControl  } from 'react-bootstrap';
 
 
 
@@ -32,49 +32,124 @@ class SelectPlayers extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      tempPlayers : [],
+      isSelected: [],
+      showModal: false,
+      newPlayer: {
+        name: '',
+        pdga: '',
+        uid: 0
+      }
     };
     this.handleSelectPlayer = this.handleSelectPlayer.bind(this);
-    this.isSelected = this.isSelected.bind(this);
+    this.handleOpen = this.handleOpen.bind(this);
+    this.handleClose = this.handleClose.bind(this);
+    this.handleFormChange = this.handleFormChange.bind(this);    
+    this.handleNewPlayer = this.handleNewPlayer.bind(this);
   }
 
-  handleSelectPlayer(index) {
-      if(! this.isSelected(this.props.savedPlayers[index])) {
-        this.tempPlayers.concat(this.savedPlayers[index])       
+  handleSelectPlayer(uid) {
+      let list = this.state.tempPlayers;
+      if(! this.state.isSelected.includes(uid)) {
+        for(let i of this.props.savedPlayers) {
+            if(i.uid == uid) {
+              list.push(i);
+            }
+          }
       } else {
-        for(let i = 0; i < this.tempPlayers.length; i++) {
-          if(this.savedPlayers[index].uid == this.tempPlayers[i].uid) {
-            this.tempPlayers.splice(i,1)
+        for(let i = 0; i < list.length; i++) {
+          if(uid == list[i].uid) {
+            list.splice(i,1);
           }
         }
       }
+      let selectedUids = this.state.tempPlayers.map( player => {
+        return player.uid;
+      })
+      this.setState({tempPlayers: list});
+      this.setState({isSelected: selectedUids})
   }
 
-  isSelected(item) {
-      for(let i of this.props.tempPlayers) {
-        if(item.uid == i.uid) {
-          return true
-        }
-      }
-      return false;
+  handleOpen() {
+    this.setState({showModal: true})    
   }
 
-  playerList = this.props.savedPlayers.map((item, index) => 
-      <ListGroupItem active={this.isSelected(item)} key={item.uid}>{item.name}</ListGroupItem>
-    )
+  handleClose() {
+    this.setState({showModal: false})
+  }
+
+  handleFormChange(evt) {
+    evt.preventDefault();
+    let newPlayer = Object.assign({}, this.state.newPlayer, { [evt.target.name] : evt.target.value});
+    let newState = Object.assign({}, this.state, {newPlayer: newPlayer});
+    this.setState(newState);    
+  }
+
+  handleNewPlayer(evt) {
+    evt.preventDefault();
+    let uid = Date.now().toString();
+    let newPlayer = Object.assign({}, this.state.newPlayer, { uid: uid});
+    this.props.saveNewPlayer(newPlayer); // add player to saved players in store    
+    this.setState({newPlayer: {}}); // clear out newPlayer in state
+    this.setState({tempPlayers: this.state.tempPlayers.concat(newPlayer)});// add to tempPlayer list
+    this.setState({isSelected: this.state.isSelected.concat(uid)});  // add to selected list
+    this.handleClose();
+  }
+
+  handleDone(props) {
+      props.setNewRoundPlayers(this.state.tempPlayers);
+      props.history.push('/new');
+  }
 
 
   render() {
+
+   const playerList = this.props.savedPlayers.map((item, index) => 
+      <ListGroupItem active={this.state.isSelected.includes(item.uid)} key={item.uid} onClick={() => this.handleSelectPlayer(item.uid)}>{item.name}</ListGroupItem>
+    )
+
     return (
       <div>
         <Grid>
           <Row>
             <Col md={2}></Col>
             <Col><h3>Select Players</h3></Col>
-            <Col md={2} className="right-align"><div className="addPlayer" click="openModal"></div></Col>
+            <Col md={2} className="right-align"><div className="addPlayer" onClick={this.handleOpen}>Add</div></Col>
           </Row>
         </Grid>
 
-        <ListGroup>{this.playerList}</ListGroup>
+        <ListGroup>{playerList}</ListGroup>
+
+        <Grid className="fixed">
+          <Row>
+            <Col><Button size="lg" bsStyle="link" href="/new">Back</Button></Col>
+            <Col className="right-align"><Button size="lg" bsStyle="primary" onClick={() => this.handleDone(this.props)}>Done</Button></Col>
+          </Row>
+        </Grid>
+
+        <Modal show={this.state.showModal}>
+          <Modal.Header>
+            <Modal.Title>New Player</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <Form onSubmit={this.handleNewPlayer}>
+              <FormGroup controlId="playerName">
+                <ControlLabel>Name</ControlLabel>
+                <FormControl name="name" type="text" value={this.state.newPlayer.name} onChange={this.handleFormChange} />
+              </FormGroup>
+              <FormGroup controlId="playerNumber">
+                <ControlLabel>PDGA</ControlLabel>
+                <FormControl name="pdga" type="text" value={this.state.newPlayer.pdga} onChange={this.handleFormChange} />
+              </FormGroup>              
+            </Form>
+          </Modal.Body>
+
+          <Modal.Footer>
+            <Button onClick={this.handleClose} bsStyle="link">Cancel</Button>
+            <Button bsStyle="primary" type="submit" onClick={this.handleNewPlayer}>Add Player</Button>
+          </Modal.Footer>
+        </Modal>
 
 
       </div>
@@ -83,11 +158,24 @@ class SelectPlayers extends Component {
   }
 }
 
-const mapStateToProps = (state, ownProps) => ({
-  tempPlayers: state.tempPlayers,
-  savedPlayers: state.savedPlayers
-})
+const mapStateToProps = (state, ownProps) => {
+  return {
+    newPlayers: state.newround.players,
+    savedPlayers: state.savedPlayers
+  }
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    setNewRoundPlayers: (players) => {
+      dispatch({type:'NEWROUND_PLAYERS', payload: players});
+    },
+    saveNewPlayer: (player) => {
+      dispatch({type:'SAVE_PLAYER', payload: player})
+    }
+  }
+}
 
 
-export default connect(mapStateToProps)(SelectPlayers);
+export default connect(mapStateToProps, mapDispatchToProps)(SelectPlayers);
 
