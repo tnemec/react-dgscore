@@ -5,7 +5,9 @@ import { Route, Switch } from 'react-router-dom';
 import Home from './components/Home.js';
 import NewRound from './components/NewRound.js';
 import SelectPlayers from './components/SelectPlayers.js';
+import SelectCourse from './components/SelectCourse.js';
 
+import LocalStore from './utilities/localStore'
 
 
 import './App.css';
@@ -20,7 +22,9 @@ class App extends Component {
              <Route exact path='/' component={Home}/>
              <Route path='/new' component={NewRound}/>
              <Route path='/players' component={SelectPlayers}/>
+             <Route path='/course' component={SelectCourse}/>             
           </Switch>
+          <LocalStore />
       </div>
     );
   }

@@ -1,32 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { Button, Grid, Col, Row, ListGroup, ListGroupItem, Modal, Form, ControlLabel, FormGroup, FormControl  } from 'react-bootstrap';
+import { Button, Grid, Col, Row, ListGroup, ListGroupItem, Modal, Form, ControlLabel, FormGroup, FormControl, Glyphicon  } from 'react-bootstrap';
 
 
-
-/*
-
-
-  <b-list-group>
-    <b-list-group-item v-for="(item, index) in savedPlayers" @click="selectPlayer(index)" class="clickable" :key="index" :active="isSelected(item)"><icon name="check" v-if="isSelected(item)" /> {{item.name}}</b-list-group-item>
-  </b-list-group>
-
-  <b-container class="fixed">
-    <b-row>
-      <b-col><b-button size="lg" variant="link" @click="back">Back</b-button></b-col>
-      <b-col style="text-align:right"><b-button size="lg" variant="primary" @click="done">Done</b-button></b-col>
-    </b-row>
-  </b-container>
-
-  <b-modal ref="newPlayer" title="New Player" @ok="addPlayer" ok-title="Add">
-    <b-form>
-      <b-form-group label="Name" label-for="playerName">
-        <b-form-input id="playerName" v-model="newPlayerName"/>
-      </b-form-group>
-    </b-form>
-  </b-modal>
-
-*/
 
 class SelectPlayers extends Component {
   constructor(props) {
@@ -113,8 +89,10 @@ class SelectPlayers extends Component {
         <Grid>
           <Row>
             <Col md={2}></Col>
-            <Col><h3>Select Players</h3></Col>
-            <Col md={2} className="right-align"><div className="addPlayer" onClick={this.handleOpen}>Add</div></Col>
+            <Col md={8}><h3>Select Players</h3></Col>
+            <Col md={2} className="right-align">
+              <div className="add-player" onClick={this.handleOpen} title="Add Player"><Glyphicon glyph="plus-sign" /></div>
+              </Col>
           </Row>
         </Grid>
 

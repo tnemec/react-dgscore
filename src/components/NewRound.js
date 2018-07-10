@@ -3,9 +3,6 @@ import { connect } from 'react-redux'
 import { Button, Grid, Col, Row } from 'react-bootstrap';
 
 
-
-
-
   const SectionPlayers = (props) => {
 
     const playerList = props.players.map((item) =><p key={item.uid}>{item.name}</p>);
@@ -15,8 +12,8 @@ import { Button, Grid, Col, Row } from 'react-bootstrap';
     return (
         <Row className="section">
           <Col md={3}><strong>Players:</strong></Col>
-          <Col md={6}>{playerList}</Col>
-          <Col md={3}><Button click="selectPlayer" bsStyle="link" bsSize="lg" href="/players">{addEditText}</Button></Col>
+          <Col md={6} className="player-list">{playerList}</Col>
+          <Col md={3}><Button onClick={props.addPlayerHandler} bsStyle="link" bsSize="lg">{addEditText}</Button></Col>
         </Row>
     );
   };
@@ -26,8 +23,8 @@ import { Button, Grid, Col, Row } from 'react-bootstrap';
     return (
             <Row className="section">
               <Col md={3}><strong>Course:</strong></Col>
-              <Col md={6}><p>{props.course.name}</p></Col>
-              <Col md={3}><Button click="selectCourse" bsStyle="link" bsSize="lg" href="/course">Select Course</Button></Col>
+              <Col md={6} className="course-name"><p>{props.courseName}</p></Col>
+              <Col md={3}><Button onClick={props.selectCourseHandler} bsStyle="link" bsSize="lg" >Select Course</Button></Col>
             </Row>
     );
   };
@@ -38,6 +35,17 @@ class NewRound extends Component {
     super(props);
     this.state = {
     };
+      console.log(this.props)
+  }
+
+
+
+  handleAddPlayer = () => {
+      this.props.history.push('/players');
+  };
+
+  handleSelectCourse = () =>  {
+      this.props.history.push('/course');    
   }
 
 
@@ -48,8 +56,8 @@ class NewRound extends Component {
           <h2>New Round</h2>
 
           <Grid>
-            <SectionPlayers players={this.props.players} />
-            <SectionCourse course={this.props.course} />
+            <SectionPlayers players={this.props.players} addPlayerHandler={this.handleAddPlayer} />
+            <SectionCourse courseName={this.props.courseName} selectCourseHandler={this.handleSelectCourse} />
 
         </Grid>
       </div>
@@ -59,9 +67,8 @@ class NewRound extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => ({
-  state: state,
   players: state.newround.players,
-  course: state.newround.course
+  courseName: state.newround.course.name,
 })
 
 export default connect(mapStateToProps)(NewRound);

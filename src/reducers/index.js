@@ -35,12 +35,20 @@ const initialState = {
 
 export default (state = initialState, action) => {
   switch (action.type) {
+    case 'RESTORE_STATE' : // restore state from localStorage
+    	console.log('load from local')
+    	return action.payload
+
     case 'NEWROUND_PLAYERS': // replace newround.players array
     	let newRound = Object.assign({}, state.newround, {players: action.payload});
     	return Object.assign({}, state, { newround : newRound });
 
     case 'SAVE_PLAYER': // add player to saved players list
     	return Object.assign({}, state, {savedPlayers: state.savedPlayers.concat(action.payload)});
+
+    case 'SELECT_COURSE': // add player to saved players list
+    	newRound = Object.assign({}, state.newround, {course: action.payload});
+    	return Object.assign({}, state, { newround : newRound });
 
     default:
     	return state

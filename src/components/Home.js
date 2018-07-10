@@ -7,8 +7,8 @@ const Previous = (props) => {
 	return (
     <div className="section" v-if="inProgress">
       <h4>Round in progress:</h4>
-      <p>{props.roundName}</p>
-      <p><Button onClick={props.resume} bsStyle="primary">Resume Round</Button></p>
+      <p>{props.courseName}</p>
+      <p><Button onClick={props.resumeHandler} bsStyle="primary">Resume Round</Button></p>
 
     </div>
 	);
@@ -17,7 +17,7 @@ const Previous = (props) => {
 const NewRound = (props) => {
 	return (
 		<div className="section">
-	      <p><Button onClick={props.newRound} bsStyle="primary">Start New Round</Button></p>
+	      <p><Button onClick={props.newRoundHandler} bsStyle="primary">Start New Round</Button></p>
 	    </div>
 
 	);
@@ -35,22 +35,26 @@ class Home extends Component {
       	}
       }
     };
+
   }
 
-newRound = (e) => {
-	e.preventDefault();
-	console.log('New Round');
-	this.props.history.push('/new');
-}
+    handleNewRound = () => {
+      this.props.history.push('/new');
+    }
+
+    handleResume = () => {
+      this.props.history.push('/play');
+    }
+
 
   render() {
     return (
   		<div className="home">
     		<h1>DG Score</h1>
 
-    		<Previous roundName={this.state.round.course.name} />    
+    		<Previous courseName={this.state.round.course.name} resumeHandler={this.handleResume}  />    
 
-    		<NewRound newRound={this.newRound}/>		
+    		<NewRound newRoundHandler={this.handleNewRound}/>		
     	</div>
 
     );
