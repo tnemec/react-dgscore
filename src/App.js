@@ -6,6 +6,7 @@ import Home from './components/Home.js';
 import NewRound from './components/NewRound.js';
 import SelectPlayers from './components/SelectPlayers.js';
 import SelectCourse from './components/SelectCourse.js';
+import Round from './components/Round.js';
 
 import LocalStore from './utilities/localStore'
 
@@ -22,7 +23,8 @@ class App extends Component {
              <Route exact path='/' component={Home}/>
              <Route path='/new' component={NewRound}/>
              <Route path='/players' component={SelectPlayers}/>
-             <Route path='/course' component={SelectCourse}/>             
+             <Route path='/course' component={SelectCourse}/>   
+             <Route path='/play/:hole?' component={Round}/>                         
           </Switch>
           <LocalStore />
       </div>

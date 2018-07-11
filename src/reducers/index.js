@@ -40,15 +40,37 @@ export default (state = initialState, action) => {
     	return action.payload
 
     case 'NEWROUND_PLAYERS': // replace newround.players array
-    	let newRound = Object.assign({}, state.newround, {players: action.payload});
-    	return Object.assign({}, state, { newround : newRound });
+    	let newround = Object.assign({}, state.newround, {players: action.payload});
+    	return Object.assign({}, state, { newround : newround });
 
     case 'SAVE_PLAYER': // add player to saved players list
     	return Object.assign({}, state, {savedPlayers: state.savedPlayers.concat(action.payload)});
 
     case 'SELECT_COURSE': // add player to saved players list
-    	newRound = Object.assign({}, state.newround, {course: action.payload});
-    	return Object.assign({}, state, { newround : newRound });
+    	newround = Object.assign({}, state.newround, {course: action.payload});
+    	return Object.assign({}, state, { newround : newround });
+
+    case 'START_ROUND':  // payload is the starting hole index
+		// reset scorecards
+		let players = state.newround.players.slice(0);
+		for(let player of players) {
+			let ar = new Array(state.newround.course.holes);
+			for(let i = 0; i < ar.length; i++) {
+				ar[i] = {s:0}
+			}
+			player.scorecard = ar;
+		}    
+    	let round = Object.assign({}, state, {
+    		course: state.newround.course,
+    		players: players,
+			finished: false,
+			started: true,
+			startTime: new Date(),
+			currentHole: action.payload
+    	});
+    	newround = Object.assign({}, state.newround, {course: {}, players: []});
+    	console.log(newround);
+    	return Object.assign({}, state, { newround : newround, round: round });
 
     default:
     	return state

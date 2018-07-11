@@ -139,3 +139,15 @@ Button {
 .player-list p, .course-name p {
   font-size: 18px;
 }
+
+.starting-hole .form-control {
+  max-width: 60px;
+  display: inline-block;
+  margin-left: 6px;
+}
+
+.newRound .section {
+  padding: 16px 0;
+  border-top: 1px solid #DDD;
+}
+
