@@ -18,12 +18,13 @@ class LocalStore extends Component {
   	let localState = window.localStorage.getItem('dg-score-rx-state');
   	if(localState && ! this.state.loaded) {
   		try {
-  			this.setState({loaded: true})
+        console.log('loaded from local')
 	    	this.props.restoreState(JSON.parse(localState))  		
 	    } catch(e) {
 	    	console.log('Failed to load from localStorage: ' + e)
 	    }
   	}
+    this.setState({loaded: true});
 
   }
 
@@ -32,7 +33,6 @@ class LocalStore extends Component {
 	render() {
 
 		if(this.state.loaded) {
-
 			try {
 				window.localStorage.setItem('dg-score-rx-state', JSON.stringify(this.props.appState));
 				console.log('save to local')

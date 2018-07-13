@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
 import { Grid, Row, Col, Glyphicon } from 'react-bootstrap';
 
 
@@ -8,22 +9,60 @@ class Round extends Component {
   constructor(props) {
     super(props);
     this.state = {
-
+      currentHole: 0
     };
 
   }
+  componentDidMount() {
+    const holeIndex = parseInt(this.props.match.params.hole) -1;
+    if(holeIndex != undefined && ! Number.isNaN(holeIndex)) {
+      this.setState({currentHole: holeIndex})
+      this.props.viewHole(holeIndex)   
+    }
+
+  };
 
   handlePrev = () => {
 
-  }
+  };
+  handleNext = () => {
 
+  };  
+  handleFinish = () => {
+
+  };
 
 
 
 
   render() {
 
-
+    const Prev = () => {
+      if (this.state.currentHole -1 >= 0) {
+        return (
+          <div className="nav" onClick={this.handlePrev}>
+            <Glyphicon glyph="menu-left" />
+          </div>
+          )
+      }    
+      return null  
+    };
+    const Next = () => {
+      if(this.state.currentHole + 1 < this.props.holes) {
+        return (
+        <div onClick={this.handleNext} className="nav align-right"><Glyphicon glyph="menu-right"  /></div>
+        )
+      }
+      return null
+    };
+    const Finish = () => {
+      if(this.state.currentHole +1 == this.props.holes) {
+        return (
+        <div onClick={this.handleFinish} className="nav"><Glyphicon glyph="check"   /></div>
+        )
+      }  
+      return null    
+    }
 
     return (
   		<div className="round">
@@ -31,41 +70,22 @@ class Round extends Component {
       <Grid className="header">
         <Row>
           <Col md={2}>
-            if (this.state.hasPrev) {
-            <div class="nav" onClick={handlePrev}>
-              <Glyphicon glyph="angle-left" />
-            </div>
-            }
+            <Prev />
           </Col>
           <Col md={2}>
-            <span class="hole-num">{this.props.round.currentHole +1}</span>
+            <span className="hole-num">{this.state.currentHole +1}</span>
           </Col>
           <Col md={6}>
-            <div class="course-name">{this.props.courseName}</div>
-            <div class="hole-info">{this.props.holeInfo()}</div>            
+            <div className="course-name">{this.props.courseName}</div>
+            <div className="hole-info">{this.props.holeInfo(this.props.holeData(this.state.currentHole))}</div>           
+          </Col>
+          <Col md={2}>
+            <Next />
+            <Finish />
           </Col>
 
-
         </Row>
-      </Grid>
-
-
-
-  <b-container class="header">
-    <b-row  align-h="between">
-      <b-col cols="2"><div @click.capture="prevPage" v-if="hasPrev" class="nav"><icon name="angle-left" scale="3" /></div></b-col>
-      <b-col cols="2"><span class="hole-num">{{round.currentHole +1}}</span></b-col>
-      <b-col cols="6">
-        <div class="course-name">{{round.course.name}}</div>
-        <div class="hole-info">{{holeInfo}}</div>
-      </b-col>
-      <b-col cols="2" class="align-right">
-        <div @click.capturet="nextPage" v-if="hasNext"  class="nav"><icon name="angle-right" scale="3"  /></div>
-        <div @click.capturet="finish" v-if="round.currentHole +1 == round.course.holes"  class="nav"><icon name="check" scale="3"  />
-        </div>
-      </b-col>
-    </b-row>
-  </b-container>      
+      </Grid>     
 
     	</div>
 
@@ -75,12 +95,21 @@ class Round extends Component {
 
 
 const mapStateToProps = (state, ownProps) => ({
-  players: state.newround.players,
-  courseName: state.newround.course.name,
+  players: state.round.players,
+  courseName: state.round.course.name,
   round: state.round,
-  holes: state.newround.course.holes || 18,
-  holeInfo: () => {
-    let data = this.$store.getters.holeData();
+  holes: state.round.course.holes || 18,
+  holeData: (i) => {
+    if(i == undefined) {
+      i = this.currentHole;
+    }
+    return {
+      num: (state.round.course.num && state.round.course.num[i]) || i +1,
+      dist: (state.round.course.dist && state.round.course.dist[i]) || '',
+      par: (state.round.course.par && state.round.course.par[i]) || state.prefs.defaultPar
+    }
+  },
+  holeInfo: (data) => {
     let par = 'Par ' + data.par + ' - ';
     let dist = data.dist + ' ft.';
     return  par + dist
@@ -89,8 +118,8 @@ const mapStateToProps = (state, ownProps) => ({
 
 const mapDispatchToProps = dispatch => {
   return {
-    startRound: (hole) => {
-      dispatch({type:'START_ROUND', payload: hole});
+    viewHole: (hole) => {
+      dispatch({type:'VIEW_HOLE', payload: hole});
     }
   }
 }

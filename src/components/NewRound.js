@@ -36,7 +36,6 @@ class NewRound extends Component {
     this.state = {
       startingHole: 1
     };
-      console.log(this.props)
   }
 
 

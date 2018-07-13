@@ -36,7 +36,6 @@ const initialState = {
 export default (state = initialState, action) => {
   switch (action.type) {
     case 'RESTORE_STATE' : // restore state from localStorage
-    	console.log('load from local')
     	return action.payload
 
     case 'NEWROUND_PLAYERS': // replace newround.players array
@@ -69,8 +68,16 @@ export default (state = initialState, action) => {
 			currentHole: action.payload
     	});
     	newround = Object.assign({}, state.newround, {course: {}, players: []});
-    	console.log(newround);
     	return Object.assign({}, state, { newround : newround, round: round });
+    case 'VIEW_HOLE' : // changes the current hole
+        const holeIndex = action.payload;
+        console.log(holeIndex)
+        if(Number.isNaN(holeIndex)) {
+            round = Object.assign({}, state, {currentHole: 0})
+        } else {
+            round = Object.assign({}, state, {currentHole: Math.max(0, Math.min(holeIndex, state.round.course.holes))})            
+        }
+        return Object.assign({}, state, { round: round });
 
     default:
     	return state
