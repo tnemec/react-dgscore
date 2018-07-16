@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { Grid, Row, Col, Glyphicon } from 'react-bootstrap';
 
-
+import PlayerCard from '../components/PlayerCard'
 
 
 class Round extends Component {
@@ -12,21 +12,34 @@ class Round extends Component {
       currentHole: 0
     };
 
+    if(! this.props.round.started) {
+      this.props.history.push('/');
+    }
+
+
+
   }
   componentDidMount() {
     const holeIndex = parseInt(this.props.match.params.hole) -1;
-    if(holeIndex != undefined && ! Number.isNaN(holeIndex)) {
+    if(holeIndex != undefined && ! Number.isNaN(holeIndex) && holeIndex != this.props.round.currentHole) {
       this.setState({currentHole: holeIndex})
       this.props.viewHole(holeIndex)   
+    } else {
+      this.setState({currentHole: this.props.round.currentHole})
     }
-
   };
 
   handlePrev = () => {
-
+    let nextHoleNum = Math.max(this.state.currentHole -1, 0)
+    this.setState({currentHole: nextHoleNum});
+    this.props.viewHole(nextHoleNum)
+    this.props.history.push('/play/' + (nextHoleNum +1) );
   };
   handleNext = () => {
-
+    let nextHoleNum = Math.min(this.state.currentHole +1, this.props.holes);
+    this.setState({currentHole: nextHoleNum});
+    this.props.viewHole(nextHoleNum)
+    this.props.history.push('/play/' + (nextHoleNum +1) );
   };  
   handleFinish = () => {
 
@@ -67,25 +80,27 @@ class Round extends Component {
     return (
   		<div className="round">
 
-      <Grid className="header">
-        <Row>
-          <Col md={2}>
-            <Prev />
-          </Col>
-          <Col md={2}>
-            <span className="hole-num">{this.state.currentHole +1}</span>
-          </Col>
-          <Col md={6}>
-            <div className="course-name">{this.props.courseName}</div>
-            <div className="hole-info">{this.props.holeInfo(this.props.holeData(this.state.currentHole))}</div>           
-          </Col>
-          <Col md={2}>
-            <Next />
-            <Finish />
-          </Col>
+        <Grid className="header">
+          <Row>
+            <Col md={2}>
+              <Prev />
+            </Col>
+            <Col md={2}>
+              <span className="hole-num">{this.state.currentHole +1}</span>
+            </Col>
+            <Col md={6}>
+              <div className="course-name">{this.props.courseName}</div>
+              <div className="hole-info">{this.props.holeInfo(this.props.holeData(this.state.currentHole))}</div>           
+            </Col>
+            <Col md={2}>
+              <Next />
+              <Finish />
+            </Col>
 
-        </Row>
-      </Grid>     
+          </Row>
+        </Grid>    
+
+        <PlayerCard player={this.props.players[0]} par={this.props.holeData(this.state.currentHole).par} index={0} hole={this.props.round.currentHole} /> 
 
     	</div>
 

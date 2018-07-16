@@ -59,7 +59,7 @@ export default (state = initialState, action) => {
 			}
 			player.scorecard = ar;
 		}    
-    	let round = Object.assign({}, state, {
+    	let round = Object.assign({}, state.round, {
     		course: state.newround.course,
     		players: players,
 			finished: false,
@@ -73,9 +73,9 @@ export default (state = initialState, action) => {
         const holeIndex = action.payload;
         console.log(holeIndex)
         if(Number.isNaN(holeIndex)) {
-            round = Object.assign({}, state, {currentHole: 0})
+            round = Object.assign({}, state.round, {currentHole: 0})
         } else {
-            round = Object.assign({}, state, {currentHole: Math.max(0, Math.min(holeIndex, state.round.course.holes))})            
+            round = Object.assign({}, state.round, {currentHole: Math.max(0, Math.min(holeIndex, state.round.course.holes))})            
         }
         return Object.assign({}, state, { round: round });
 

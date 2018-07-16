@@ -19,15 +19,15 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-      
+          <LocalStore />      
           <Switch>
              <Route exact path='/' component={Home}/>
              <Route path='/new' component={NewRound}/>
              <Route path='/players' component={SelectPlayers}/>
              <Route path='/course' component={SelectCourse}/>   
-             <Route path='/play/:hole' component={Round}/>                         
+             <Route path='/play/:hole?' component={Round}/>                         
           </Switch>
-          <LocalStore />
+
       </div>
     );
   }
