@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { Grid, Row, Col, Glyphicon } from 'react-bootstrap';
+import { Redirect } from 'react-router'
 
 import PlayerCard from '../components/PlayerCard'
 
@@ -12,9 +13,7 @@ class Round extends Component {
       currentHole: 0
     };
 
-    if(! this.props.round.started) {
-      this.props.history.push('/');
-    }
+
 
 
 
@@ -50,6 +49,10 @@ class Round extends Component {
 
   render() {
 
+    if(! this.props.round.started) {
+      return <Redirect to="/" />
+    }
+
     const Prev = () => {
       if (this.state.currentHole -1 >= 0) {
         return (
@@ -77,6 +80,11 @@ class Round extends Component {
       return null    
     }
 
+    const playerCards =  this.props.players.map((item) => 
+      <PlayerCard player={item} par={this.props.holeData(this.state.currentHole).par} index={0} hole={this.props.round.currentHole} key={item.uid} />
+    );
+
+
     return (
   		<div className="round">
 
@@ -100,7 +108,7 @@ class Round extends Component {
           </Row>
         </Grid>    
 
-        <PlayerCard player={this.props.players[0]} par={this.props.holeData(this.state.currentHole).par} index={0} hole={this.props.round.currentHole} /> 
+        {playerCards}
 
     	</div>
 
@@ -110,7 +118,7 @@ class Round extends Component {
 
 
 const mapStateToProps = (state, ownProps) => ({
-  players: state.round.players,
+  players: state.round.players || [{name: 'null'}],
   courseName: state.round.course.name,
   round: state.round,
   holes: state.round.course.holes || 18,

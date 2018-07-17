@@ -193,3 +193,113 @@ Button {
 .round .header .hole-info {
   font-size: 22px;
 }
+
+
+
+.player-picture{
+  background-color: #DDDDDD;
+  border-radius: 100%;
+  margin: 6px 16px 8px  28px;
+  float: left;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-image: url('./assets/abstract-user.svg');
+  background-size: 100%;
+}
+
+.player-card .label-bar {
+  background-color: #184159;
+  position: relative;
+  text-shadow: none;
+  color: #FFFFFF;
+  font-size: 21px;
+}
+
+.player-card .label-bar .player-label {
+  font-weight: 700;
+  font-size: 20px;
+  color: #FFFFFF;
+  padding: 8px 16px;
+  padding-left: 24px;
+}
+.player-card .label-bar .round-score-label {
+  font-size: 10px;
+  color: #adc5d3;
+  text-align: right;
+  text-transform: uppercase;
+  position: absolute;
+  top: 2px;
+  right: 8px;
+}
+
+.player-card .label-bar .round-score-value {
+  position: absolute;
+  top: 14px;
+  right: 64px;
+}
+
+.player-card .label-bar .round-par-value {
+  position: absolute;
+  top: 14px;
+  right: 12px;
+}
+
+.player-card .player-grid {
+  height: 72px;
+  border-bottom: 1px solid #184159;
+  box-shadow: 0px 4px 4px -1px rgba(0,0,0,0.40);
+}
+.player-card.played  {
+  background: #d7ecf4; /* Old browsers */
+  background: linear-gradient(to right, #d7ecf4 45%,#ffffff 100%);
+}
+.player-card .player-grid .player-picture{
+  width: 56px;
+  height: 56px;
+}
+
+.player-card .player-grid .strokes {
+  text-align: right;
+  margin-right: 32px;
+  float: right;
+  position: relative;
+}
+
+.player-card .player-grid .strokes * {
+  position: absolute;
+  top: 12px;
+}
+.player-card .player-grid .strokes .minus {
+  font-size: 32px;
+  right: 124px;
+  width: 32px;
+  cursor: pointer
+}
+.player-card .player-grid .strokes .plus {
+    font-size: 32px;
+  right: 16px;
+  width: 32px;
+  cursor: pointer
+}
+
+.player-card .player-grid .strokes.played .fa-icon {
+  fill: #bfced6;
+}
+
+.player-card  .player-grid .strokes .strokes-label {
+  font-size: 10px;
+  color: #777777;
+  text-align: center;
+  text-transform: uppercase;
+  right: 32px;
+  top: 6px;
+}
+
+.player-card .player-grid .strokes .stroke-value {
+  font-size: 42px;
+  line-height: 20px;
+  text-align: center;
+  top: 30px;
+    right: 20px;
+    width: 70px;
+}

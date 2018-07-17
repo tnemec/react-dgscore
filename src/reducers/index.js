@@ -1,6 +1,7 @@
 
 
 const initialState = {
+	loadedState: false,
   	prefs: {
   		defaultPar: 3,
   		maxPlayers : 6,
@@ -36,6 +37,7 @@ const initialState = {
 export default (state = initialState, action) => {
   switch (action.type) {
     case 'RESTORE_STATE' : // restore state from localStorage
+    	action.payload.loadedState = true;
     	return action.payload
 
     case 'NEWROUND_PLAYERS': // replace newround.players array

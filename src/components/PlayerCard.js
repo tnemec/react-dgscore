@@ -42,14 +42,14 @@ class PlayerCard extends Component {
           </div>
           <div className="player-grid">
             <div className="player-picture"></div>
-            <div className="strokes" className="{ played : played }">
+            <div className="strokes" className={this.props.played ?  'played strokes' : 'strokes' }>
               <div className="strokes-label">Strokes</div>
               <div className="minus" onClick={this.subStroke}>
-                <Glyphicon glyph="minus-circle" scale="2" />
+                <Glyphicon glyph="minus-sign" scale="2" />
               </div>
               <div className="stroke-value" >{this.props.currentStrokes}</div>
               <div  className="plus" onClick={this.addStroke}>
-                <Glyphicon glyph="plus-circle" scale="2" />
+                <Glyphicon glyph="plus-sign" scale="2" />
               </div>
             </div>
           </div>
@@ -79,7 +79,8 @@ const mapStateToProps = (state, ownProps) => {
       totalStrokes: 0,
       currentPar: 0
     },
-    currentStrokes : 0
+    currentStrokes : 0,
+    played: state.round.holesPlayed.indexOf(ownProps.hole) != -1 
   }
 };
 
