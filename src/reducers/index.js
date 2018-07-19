@@ -73,13 +73,43 @@ export default (state = initialState, action) => {
     	return Object.assign({}, state, { newround : newround, round: round });
     case 'VIEW_HOLE' : // changes the current hole
         const holeIndex = action.payload;
-        console.log(holeIndex)
         if(Number.isNaN(holeIndex)) {
             round = Object.assign({}, state.round, {currentHole: 0})
         } else {
             round = Object.assign({}, state.round, {currentHole: Math.max(0, Math.min(holeIndex, state.round.course.holes))})            
         }
         return Object.assign({}, state, { round: round });
+
+   case 'SET_STROKES' : 
+   		players = state.round.players.slice(0);
+		players.map((player) => {
+			if(player.uid == action.payload.player) {
+				if(! player.scorecard) {
+					player.scorecard = []
+				}
+				if(! player.scorecard[action.payload.hole]) {
+					player.scorecard[action.payload.hole] = {s:0}
+				}
+				 player.scorecard[action.payload.hole].s = action.payload.strokes	
+			}
+		});
+		round = Object.assign({}, state.round, {players: players});
+		return Object.assign({}, state, { round: round });
+
+	case 'SET_DEFAULT_STROKES' : 
+		let hole = action.payload;
+		players = state.round.players.slice(0);
+		for(let player of players) {
+			if(player.scorecard[hole].s == 0) {
+				player.scorecard[hole].s = (state.round.course.par && state.round.course.par[hole]) || state.prefs.defaultPar;
+			}
+		}
+		let holesPlayed = state.round.holesPlayed.slice(0);
+		if(holesPlayed.indexOf(hole) == -1) {
+			holesPlayed.push(hole)
+		}
+		round = Object.assign({}, state.round, {players: players, holesPlayed: holesPlayed});
+		return Object.assign({}, state, { round: round });
 
     default:
     	return state

@@ -37,6 +37,7 @@ class Round extends Component {
   handleNext = () => {
     let nextHoleNum = Math.min(this.state.currentHole +1, this.props.holes);
     this.setState({currentHole: nextHoleNum});
+    this.props.setDefaultStrokes(this.state.currentHole)
     this.props.viewHole(nextHoleNum)
     this.props.history.push('/play/' + (nextHoleNum +1) );
   };  
@@ -143,6 +144,9 @@ const mapDispatchToProps = dispatch => {
   return {
     viewHole: (hole) => {
       dispatch({type:'VIEW_HOLE', payload: hole});
+    },
+    setDefaultStrokes: (hole) => {
+      dispatch({type:'SET_DEFAULT_STROKES', payload: hole})
     }
   }
 }

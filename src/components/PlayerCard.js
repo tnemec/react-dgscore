@@ -20,11 +20,21 @@ class PlayerCard extends Component {
 
 
   };
-  subStroke = () => {
-
+  subStroke = (props) => {
+        let payload = {
+          player: props.player.uid,
+          hole: props.hole,
+          strokes: Math.max(props.currentStrokes -1, 1)
+        }
+        props.setStrokes(payload)    
   };
-  addStroke = () => {
-
+  addStroke = (props) => {
+        let payload = {
+          player: props.player.uid,
+          hole: props.hole,
+          strokes: Math.min(props.currentStrokes + 1, props.strokesLimit)
+        }
+        props.setStrokes(payload)     
   }
 
 
@@ -37,18 +47,18 @@ class PlayerCard extends Component {
           <div className="label-bar">
             <div className="player-label">{this.props.player.name}</div>
             <div className="round-score-label">Current Score</div>
-            <div className="round-score-value">{this.props.score.totalStrokes}</div>
-            <div className="round-par-value">{this.props.score.currentPar}</div>
+            <div className="round-score-value">{this.props.score().totalStrokes}</div>
+            <div className="round-par-value">{this.props.score().currentPar}</div>
           </div>
           <div className="player-grid">
             <div className="player-picture"></div>
             <div className="strokes" className={this.props.played ?  'played strokes' : 'strokes' }>
               <div className="strokes-label">Strokes</div>
-              <div className="minus" onClick={this.subStroke}>
+              <div className="minus" onClick={() => this.subStroke(this.props)}>
                 <Glyphicon glyph="minus-sign" scale="2" />
               </div>
               <div className="stroke-value" >{this.props.currentStrokes}</div>
-              <div  className="plus" onClick={this.addStroke}>
+              <div  className="plus" onClick={() => this.addStroke(this.props)}>
                 <Glyphicon glyph="plus-sign" scale="2" />
               </div>
             </div>
@@ -79,14 +89,41 @@ const mapStateToProps = (state, ownProps) => {
       totalStrokes: 0,
       currentPar: 0
     },
-    currentStrokes : 0,
-    played: state.round.holesPlayed.indexOf(ownProps.hole) != -1 
+    currentStrokes : Math.max(ownProps.player.scorecard[ownProps.hole].s || ownProps.par, 0),
+    played: state.round.holesPlayed.indexOf(ownProps.hole) != -1,
+    strokesLimit: state.prefs.strokeLimit,
+    score: () => {
+      let card = ownProps.player.scorecard;
+
+      if(card) {
+        let totalStrokes = 0;
+        let midRoundStrokes = 0;
+        let currentPar = 0;
+        for(let i = 0; i < card.length; i++ ){
+          if(card[i] && card[i].s != undefined && card[i].s != 0) {
+            totalStrokes +=  card[i].s;
+            let par = (state.round.course.par && state.round.course.par[i]) || state.prefs.defaultPar;
+            currentPar +=  (card[i].s - par);
+            if(i < Math.floor(state.round.course.holes/2)) {
+              // calculate the mid round total
+              midRoundStrokes +=  card[i].s;
+            }
+          } 
+        }
+        currentPar = (currentPar > 0) ? '+' + currentPar: currentPar;
+        currentPar = (currentPar == 0) ? 'E' : currentPar;
+        return {'totalStrokes' : totalStrokes, 'currentPar' : currentPar, 'midRoundStrokes' : midRoundStrokes};
+      }
+      return {'totalStrokes' : '-', 'currentPar' : '-', 'midRoundStrokes' : 0};
+    }
   }
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-
+    setStrokes: (payload) => {
+      dispatch({type:'SET_STROKES', payload: payload});
+    }
   }
 }
 
