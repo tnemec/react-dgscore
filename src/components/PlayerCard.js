@@ -73,7 +73,7 @@ class PlayerCard extends Component {
             </div>
           </div>
           <div className="extras-bar"></div>
-          <ChartLine scores="player.scorecard" totals="score"></ChartLine>
+          <ChartLine scores={this.props.player.scorecard} totals={this.props.score}></ChartLine>
 
         </div>
     );
@@ -92,10 +92,6 @@ class PlayerCard extends Component {
 const mapStateToProps = (state, ownProps) => {
 
   return {
-    score: {
-      totalStrokes: 0,
-      currentPar: 0
-    },
     currentStrokes : Math.max(ownProps.player.scorecard[ownProps.hole].s || ownProps.par, 0),
     played: state.round.holesPlayed.indexOf(ownProps.hole) != -1,
     strokesLimit: state.prefs.strokeLimit,
