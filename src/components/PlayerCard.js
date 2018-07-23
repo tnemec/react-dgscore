@@ -11,7 +11,7 @@ class PlayerCard extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      
+
     };
 
   }
@@ -21,21 +21,30 @@ class PlayerCard extends Component {
 
   };
   subStroke = (props) => {
-        let payload = {
-          player: props.player.uid,
-          hole: props.hole,
-          strokes: Math.max(props.currentStrokes -1, 1)
-        }
-        props.setStrokes(payload)    
+    if(this.props.played && ! this.props.unlockEdit) {
+      this.props.openModal();
+    } else {
+      let payload = {
+        player: props.player.uid,
+        hole: props.hole,
+        strokes: Math.max(props.currentStrokes -1, 1)
+      }
+      props.setStrokes(payload) 
+    }
   };
   addStroke = (props) => {
-        let payload = {
-          player: props.player.uid,
-          hole: props.hole,
-          strokes: Math.min(props.currentStrokes + 1, props.strokesLimit)
-        }
-        props.setStrokes(payload)     
-  }
+    if(this.props.played && ! this.props.unlockEdit) {
+      this.props.openModal();
+    } else {
+      let payload = {
+        player: props.player.uid,
+        hole: props.hole,
+        strokes: Math.min(props.currentStrokes + 1, props.strokesLimit)
+      }
+      props.setStrokes(payload)  
+    }   
+  };
+
 
 
   render() {
@@ -64,9 +73,7 @@ class PlayerCard extends Component {
             </div>
           </div>
           <div className="extras-bar"></div>
-            <ChartLine scores="player.scorecard" totals="score"></ChartLine>
-
-
+          <ChartLine scores="player.scorecard" totals="score"></ChartLine>
 
         </div>
     );

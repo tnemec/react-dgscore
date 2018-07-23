@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { Grid, Row, Col, Glyphicon } from 'react-bootstrap';
+import { Grid, Row, Col, Glyphicon, Modal, Button } from 'react-bootstrap';
 import { Redirect } from 'react-router'
 
 import PlayerCard from '../components/PlayerCard'
@@ -10,10 +10,10 @@ class Round extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentHole: 0
+      currentHole: 0,
+      unlockEdit: false,
+      showModal: false
     };
-
-
 
 
 
@@ -33,6 +33,7 @@ class Round extends Component {
     this.setState({currentHole: nextHoleNum});
     this.props.viewHole(nextHoleNum)
     this.props.history.push('/play/' + (nextHoleNum +1) );
+    this.lock();
   };
   handleNext = () => {
     let nextHoleNum = Math.min(this.state.currentHole +1, this.props.holes);
@@ -40,11 +41,26 @@ class Round extends Component {
     this.props.setDefaultStrokes(this.state.currentHole)
     this.props.viewHole(nextHoleNum)
     this.props.history.push('/play/' + (nextHoleNum +1) );
+    this.lock();
   };  
   handleFinish = () => {
 
   };
 
+
+  unlock = () => {
+    this.setState({unlockEdit: true});
+    this.handleClose();
+  };
+  lock = () => {
+    this.setState({unlockEdit: false});
+  };
+  openModal = () => {
+    this.setState({showModal: true})
+  };
+  handleClose = () => {
+    this.setState({showModal: false})
+  };
 
 
 
@@ -82,7 +98,7 @@ class Round extends Component {
     }
 
     const playerCards =  this.props.players.map((item) => 
-      <PlayerCard player={item} par={this.props.holeData(this.state.currentHole).par} index={0} hole={this.props.round.currentHole} key={item.uid} />
+      <PlayerCard player={item} par={this.props.holeData(this.state.currentHole).par} index={0} hole={this.props.round.currentHole} key={item.uid} openModal={this.openModal} unlockEdit={this.state.unlockEdit} />
     );
 
 
@@ -110,6 +126,21 @@ class Round extends Component {
         </Grid>    
 
         {playerCards}
+
+
+          <Modal show={this.state.showModal}>
+            <Modal.Header>
+              <Modal.Title>Edit Score</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              This hole has been played. Do you want to edit the score?
+            </Modal.Body>
+            <Modal.Footer>
+              <Button onClick={this.handleClose} bsStyle="link">Cancel</Button>
+              <Button bsStyle="primary" type="submit" onClick={this.unlock}>OK</Button>
+            </Modal.Footer>
+          </Modal>
+
 
     	</div>
 

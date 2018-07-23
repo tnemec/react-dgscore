@@ -276,14 +276,14 @@ Button {
   cursor: pointer
 }
 .player-card .player-grid .strokes .plus {
-    font-size: 32px;
+  font-size: 32px;
   right: 16px;
   width: 32px;
   cursor: pointer
 }
 
-.player-card .player-grid .strokes.played .fa-icon {
-  fill: #bfced6;
+.player-card .player-grid .strokes.played .glyphicon {
+  color: #bfced6;
 }
 
 .player-card  .player-grid .strokes .strokes-label {
