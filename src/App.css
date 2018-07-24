@@ -413,3 +413,34 @@ Button {
     }
 
   }
+
+.scorecard  .header {
+  background-color: #E5E5E5;
+  border-bottom: 2px solid #333;
+  padding-bottom: 6px;
+}
+
+.scorecard .header div {
+  text-align: center;
+}
+
+.scorecard .header .course-name {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.scorecard .chart .row {
+  padding-bottom: 8px;
+}
+
+.scorecard .chart .player-name {
+  height: 28px;
+  line-height: 28px;
+  border-bottom: #333 solid 1px;
+  border-right: #333 solid 1px;
+}
+
+.scorecard .chart .grid {
+  padding-left: 0;
+  padding-right: 0;
+}

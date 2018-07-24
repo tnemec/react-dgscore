@@ -1,17 +1,21 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
 import { Button } from 'react-bootstrap';
 
 
 
 const Previous = (props) => {
-	return (
-    <div className="section" v-if="inProgress">
-      <h4>Round in progress:</h4>
-      <p>{props.courseName}</p>
-      <p><Button onClick={props.resumeHandler} bsStyle="primary">Resume Round</Button></p>
+  if(props.round.started && ! props.round.finished) {
+  	return (
+      <div className="section" v-if="inProgress">
+        <h4>Round in progress:</h4>
+        <p>{props.courseName}</p>
+        <p><Button onClick={props.resumeHandler} bsStyle="primary">Resume Round</Button></p>
 
-    </div>
-	);
+      </div>
+  	)
+  }
+  return null
 }
 
 const NewRound = (props) => {
@@ -37,14 +41,18 @@ class Home extends Component {
     };
 
   }
+  componentDidMount() {
 
-    handleNewRound = () => {
-      this.props.history.push('/new');
-    }
 
-    handleResume = () => {
-      this.props.history.push('/play');
-    }
+  };
+
+  handleNewRound = () => {
+    this.props.history.push('/new');
+  };
+
+  handleResume = () => {
+    this.props.history.push('/play/' + (this.props.round.currentHole -1));
+  };
 
 
   render() {
@@ -52,7 +60,7 @@ class Home extends Component {
   		<div className="home">
     		<h1>DG Score</h1>
 
-    		<Previous courseName={this.state.round.course.name} resumeHandler={this.handleResume}  />    
+    		<Previous round={this.props.round} courseName={this.props.round.course.name} resumeHandler={this.handleResume}  />    
 
     		<NewRound newRoundHandler={this.handleNewRound}/>		
     	</div>
@@ -61,5 +69,20 @@ class Home extends Component {
   }
 }
 
-export default Home;
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    round: state.round
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+
+  }
+}
+
+
+export default connect(mapStateToProps,mapDispatchToProps)(Home);
+
 

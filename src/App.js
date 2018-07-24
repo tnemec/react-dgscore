@@ -7,6 +7,7 @@ import NewRound from './components/NewRound.js';
 import SelectPlayers from './components/SelectPlayers.js';
 import SelectCourse from './components/SelectCourse.js';
 import Round from './components/Round.js';
+import Scorecard from './components/Scorecard.js';
 
 import LocalStore from './utilities/localStore'
 
@@ -25,7 +26,8 @@ class App extends Component {
              <Route path='/new' component={NewRound}/>
              <Route path='/players' component={SelectPlayers}/>
              <Route path='/course' component={SelectCourse}/>   
-             <Route path='/play/:hole?' component={Round}/>                         
+             <Route path='/play/:hole?' component={Round}/>    
+            <Route path='/scorecard' component={Scorecard}/>                      
           </Switch>
 
       </div>

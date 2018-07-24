@@ -61,15 +61,19 @@ class PlayerCard extends Component {
           </div>
           <div className="player-grid">
             <div className="player-picture"></div>
-            <div className="strokes" className={this.props.played ?  'played strokes' : 'strokes' }>
+            <div className="strokes" className={this.props.played  ?  'played strokes' : 'strokes' }>
               <div className="strokes-label">Strokes</div>
-              <div className="minus" onClick={() => this.subStroke(this.props)}>
-                <Glyphicon glyph="minus-sign" scale="2" />
-              </div>
+              {!this.props.finished && 
+                <div className="minus" onClick={() => this.subStroke(this.props)}>
+                  <Glyphicon glyph="minus-sign" scale="2" />
+                </div>
+              }
               <div className="stroke-value" >{this.props.currentStrokes}</div>
-              <div  className="plus" onClick={() => this.addStroke(this.props)}>
-                <Glyphicon glyph="plus-sign" scale="2" />
-              </div>
+              {!this.props.finished && 
+                <div  className="plus" onClick={() => this.addStroke(this.props)}>
+                  <Glyphicon glyph="plus-sign" scale="2" />
+                </div>
+              }
             </div>
           </div>
           <div className="extras-bar"></div>
@@ -92,6 +96,7 @@ class PlayerCard extends Component {
 const mapStateToProps = (state, ownProps) => {
 
   return {
+    finished: state.round.finished,
     currentStrokes : Math.max(ownProps.player.scorecard[ownProps.hole].s || ownProps.par, 0),
     played: state.round.holesPlayed.indexOf(ownProps.hole) != -1,
     strokesLimit: state.prefs.strokeLimit,

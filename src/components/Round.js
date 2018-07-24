@@ -12,13 +12,18 @@ class Round extends Component {
     this.state = {
       currentHole: 0,
       unlockEdit: false,
-      showModal: false
+      showEditModal: false,
+      showFinishModal: false
     };
 
 
 
   }
   componentDidMount() {
+    if(!this.props.players.length) {
+      // invalid round, go back to home
+      this.props.history.push('/')
+    }
     const holeIndex = parseInt(this.props.match.params.hole) -1;
     if(holeIndex != undefined && ! Number.isNaN(holeIndex) && holeIndex != this.props.round.currentHole) {
       this.setState({currentHole: holeIndex})
@@ -38,30 +43,44 @@ class Round extends Component {
   handleNext = () => {
     let nextHoleNum = Math.min(this.state.currentHole +1, this.props.holes);
     this.setState({currentHole: nextHoleNum});
-    this.props.setDefaultStrokes(this.state.currentHole)
+    if(!this.props.round.finished) {
+      this.props.setDefaultStrokes(this.state.currentHole);
+    }
     this.props.viewHole(nextHoleNum)
     this.props.history.push('/play/' + (nextHoleNum +1) );
     this.lock();
+  }; 
+  toHome = () => {
+    this.props.history.push('/')
+  };
+  viewScorecard = () => {
+      this.props.history.push('/scorecard')
   };  
   handleFinish = () => {
-
+      this.props.finishRound();
+      this.handleFinishClose();
+      this.props.history.push('/scorecard')
   };
-
 
   unlock = () => {
     this.setState({unlockEdit: true});
-    this.handleClose();
+    this.handleEditClose();
   };
   lock = () => {
     this.setState({unlockEdit: false});
   };
-  openModal = () => {
-    this.setState({showModal: true})
+  openEditModal = () => {
+    this.setState({showEditModal: true})
   };
-  handleClose = () => {
-    this.setState({showModal: false})
+  handleEditClose = () => {
+    this.setState({showEditModal: false})
   };
-
+  openFinishModal = () => {
+    this.setState({showFinishModal: true})
+  };
+  handleFinishClose = () => {
+    this.setState({showFinishModal: false})
+  };
 
 
   render() {
@@ -91,14 +110,14 @@ class Round extends Component {
     const Finish = () => {
       if(this.state.currentHole +1 == this.props.holes) {
         return (
-        <div onClick={this.handleFinish} className="nav"><Glyphicon glyph="check"   /></div>
+        <div onClick={this.openFinishModal} className="nav"><Glyphicon glyph="check"   /></div>
         )
       }  
       return null    
     }
 
     const playerCards =  this.props.players.map((item) => 
-      <PlayerCard player={item} par={this.props.holeData(this.state.currentHole).par} index={0} hole={this.props.round.currentHole} key={item.uid} openModal={this.openModal} unlockEdit={this.state.unlockEdit} />
+      <PlayerCard player={item} par={this.props.holeData(this.state.currentHole).par} index={0} hole={this.props.round.currentHole} key={item.uid} openModal={this.openEditModal} unlockEdit={this.state.unlockEdit} />
     );
 
 
@@ -128,7 +147,15 @@ class Round extends Component {
         {playerCards}
 
 
-          <Modal show={this.state.showModal}>
+  <Grid className="fixed">
+    <Row>
+      <Col md={6}><Button onClick={this.toHome} bsStyle="link" bsSize="lg">Home</Button></Col>
+      <Col md={6} className="right-align"><Button onClick={this.viewScorecard} bsStyle="link"  bsSize="lg">View Scorecard</Button></Col>
+    </Row>
+  </Grid>
+
+
+          <Modal show={this.state.showEditModal}>
             <Modal.Header>
               <Modal.Title>Edit Score</Modal.Title>
             </Modal.Header>
@@ -136,10 +163,24 @@ class Round extends Component {
               This hole has been played. Do you want to edit the score?
             </Modal.Body>
             <Modal.Footer>
-              <Button onClick={this.handleClose} bsStyle="link">Cancel</Button>
+              <Button onClick={this.handleEditClose} bsStyle="link">Cancel</Button>
               <Button bsStyle="primary" type="submit" onClick={this.unlock}>OK</Button>
             </Modal.Footer>
           </Modal>
+
+
+          <Modal show={this.state.showFinishModal}>
+            <Modal.Header>
+              <Modal.Title>Finish Round</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              You can continue to edit after you finish the round.
+            </Modal.Body>
+            <Modal.Footer>
+              <Button onClick={this.handleFinishClose} bsStyle="link">Cancel</Button>
+              <Button bsStyle="primary" type="submit" onClick={this.handleFinish}>View Scorecard</Button>
+            </Modal.Footer>
+          </Modal>          
 
 
     	</div>
