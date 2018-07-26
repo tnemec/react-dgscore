@@ -27,7 +27,7 @@ class App extends Component {
              <Route path='/players' component={SelectPlayers}/>
              <Route path='/course' component={SelectCourse}/>   
              <Route path='/play/:hole?' component={Round}/>    
-            <Route path='/scorecard' component={Scorecard}/>                      
+            <Route path='/scorecard/:alt?' component={Scorecard}/>                      
           </Switch>
 
       </div>

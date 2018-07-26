@@ -53,10 +53,12 @@ class Home extends Component {
   };
 
   handleNewRound = () => {
+    this.props.clearAlt();
     this.props.history.push('/new');
   };
 
   handleResume = () => {
+    this.props.clearAlt();
     this.props.history.push('/play/' + (this.props.round.currentHole -1));
   };
 
@@ -76,16 +78,21 @@ class Home extends Component {
     return undefined
   };
 
+  loadAltRound = (index) => {
+    this.props.loadAlt(this.state.prevRounds[index]);
+    this.props.history.push('/scorecard/alt');
+  }
+
 
   render() {
 
     const PrevRounds = () => {
       if(this.state.prevRounds.length) {
 
-        const list = this.state.prevRounds.map( (item) => {
+        const list = this.state.prevRounds.map( (item, index) => {
           if(item) {
             return (
-              <li key={item.startTime}>
+              <li key={item.startTime} onClick={() => this.loadAltRound(index)}>
                 <Grid><Row>
                   <Col md={6}>{item.course.name}</Col>
                   <Col md={6}>{this.formatDate(item.startTime)} <Glyphicon glyph="eye-open" /></Col>
@@ -131,7 +138,12 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-
+    loadAlt: (payload) => {
+      dispatch({type:'LOAD_ALT_ROUND', payload: payload});
+    },
+    clearAlt: (payload) => {
+      dispatch({type:'CLEAR_ALT_ROUND', payload: null});
+    }
   }
 }
 

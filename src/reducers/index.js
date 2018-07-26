@@ -27,7 +27,12 @@ const initialState = {
     	course: {},
     	players: []
     },
+    altRound : {
+    	course: {},
+    	players: []
+    },
     savedPlayers : [
+		{name: 'Tony', uid: 100, img: '', icon: ''},     
 		{name: 'Steve', uid: 101, img: '', icon: ''}, 
 		{name: 'Andrew', uid: 102, img: '', icon: ''}, 
 	]
@@ -117,6 +122,12 @@ export default (state = initialState, action) => {
 	case 'FINISH_ROUND' : 
 		round = Object.assign({}, state.round, {finished: true, finishTime: new Date()});
 		return Object.assign({}, state, { round: round });		
+
+	case 'LOAD_ALT_ROUND' : 
+		return Object.assign({}, state, { altRound: action.payload });	
+
+	case 'CLEAR_ALT_ROUND' : 
+		return Object.assign({}, state, { altRound: {course: {}, players: []} });	
 
     default:
     	return state

@@ -18,10 +18,10 @@ class Scorecard extends Component {
 
   }
   componentDidMount() {
-  if(!this.props.players().length) {
-    // invalid round, go back to home
-    this.props.history.push('/')
-  };
+    if(!this.props.players().length) {
+      // invalid round, go back to home
+      this.props.history.push('/')
+    };
   };
   toHome = () => {
     this.props.history.push('/')
@@ -117,9 +117,14 @@ class Scorecard extends Component {
             <Grid className="fixed">
               <Row>
                 <Col md={4}><Button onClick={this.toHome} bsStyle="link"  bsSize="lg">Home</Button></Col>
-                <Col md={4} className="center-align"><Button onClick={this.resume}  bsStyle="link" bsSize="lg">Return</Button></Col>
+                <Col md={4} className="center-align">
+                  {!this.props.match.params.alt &&
+                    <Button onClick={this.resume}  bsStyle="link" bsSize="lg">Return</Button>
+                  }
+
+                    </Col>
                 <Col md={4} className="right-align">
-                  {!this.props.round.finished && 
+                  {!this.props.round.finished && !this.props.match.params.alt &&
                     <Button onClick={this.openSaveModal}  bsStyle="link" bsSize="lg">Save Round</Button>
                   }
                 </Col>
@@ -148,20 +153,23 @@ class Scorecard extends Component {
 
 
 const mapStateToProps = (state, ownProps) => {
+  // is altRound is set, use it, otherwise, use round
+  const theRound = (state.altRound.startTime) ? state.altRound : state.round;
+
   return {
-    round: state.round,
-    course: state.round.course,
-    currentHole: state.round.currentHole,
-    roundDate: new Date(state.round.startTime).toLocaleString(),
+    round: theRound,
+    course: theRound.course,
+    currentHole: theRound.currentHole,
+    roundDate: new Date(theRound.startTime).toLocaleString(),
     coursePar: () => {
       let total = 0;
-      for(let i = 0; i < state.round.course.holes; i++) {
-        total += (state.round.course.par && state.round.course.par[i]) || state.prefs.defaultPar;
+      for(let i = 0; i < theRound.course.holes; i++) {
+        total += (theRound.course.par && theRound.course.par[i]) || state.prefs.defaultPar;
       }
       return total
     },
     players: () => { 
-      return state.round.players.map( (item) => {
+      return theRound.players.map( (item) => {
           let card = item.scorecard;
           if(card) {
             let totalStrokes = 0;
@@ -170,9 +178,9 @@ const mapStateToProps = (state, ownProps) => {
             for(let i = 0; i < card.length; i++ ){
               if(card[i] && card[i].s != undefined && card[i].s != 0) {
                 totalStrokes +=  card[i].s;
-                let par = (state.round.course.par && state.round.course.par[i]) || state.prefs.defaultPar;
+                let par = (theRound.course.par && theRound.course.par[i]) || state.prefs.defaultPar;
                 currentPar +=  (card[i].s - par);
-                if(i < Math.floor(state.round.course.holes/2)) {
+                if(i < Math.floor(theRound.course.holes/2)) {
                   // calculate the mid round total
                   midRoundStrokes +=  card[i].s;
                 }
