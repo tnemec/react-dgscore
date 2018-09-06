@@ -199,10 +199,11 @@ const mapStateToProps = (state, ownProps) => ({
     if(i == undefined) {
       i = this.currentHole;
     }
+    let holeData = state.round.course.holeData;
     return {
-      num: (state.round.course.num && state.round.course.num[i]) || i +1,
-      dist: (state.round.course.dist && state.round.course.dist[i]) || '',
-      par: (state.round.course.par && state.round.course.par[i]) || state.prefs.defaultPar
+      num: (holeData && holeData[i] && holeData[i].n) || i +1,
+      dist: (holeData && holeData[i] && holeData[i].d) || '',
+      par: (holeData && holeData[i] && holeData[i].p) || state.prefs.defaultPar
     }
   },
   holeInfo: (data) => {

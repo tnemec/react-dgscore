@@ -1,4 +1,13 @@
-This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
+# react-dgscore
+
+> Disc Golf score keeping app built with the React framework
+
+
+## Work in progress
+
+This project is a work in progress with the goal to develop a basic single page web application as a learning tool for JavaScript frameworks.
+
+It's my intention to build the same design using the VueJS framework and AngularJS.
 
 
 ## Available Scripts
