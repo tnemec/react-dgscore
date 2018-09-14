@@ -81,6 +81,7 @@
   width: 100%;
   max-width: 720px;
   bottom: 0px;
+  background: #FFF;
   border-top: 1px solid #AAA;
   overflow: hidden;
 }

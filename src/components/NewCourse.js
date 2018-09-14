@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { Button, Grid, Col, Row, ListGroup, ListGroupItem, Modal, Form, ControlLabel, FormGroup, FormControl, Glyphicon  } from 'react-bootstrap';
+import { Button, Grid, Col, Row, ListGroup, ListGroupItem, Modal, Form, ControlLabel, FormGroup, FormControl, Glyphicon, Checkbox  } from 'react-bootstrap';
 
-import localCourses from '../utilities/localCourses.js'
+import localCourses from '../utilities/localCourses.js';
 
-
+import constants from '../utilities/constants.js';
 
 
 
@@ -25,6 +25,17 @@ class NewCourse extends Component {
   
   }
 
+    totalPar = () => {
+      let total = 0;
+      if (this.state.newCourse.holeData.length) {
+        total = this.state.newCourse.holeData.reduce((acc, item) => {
+          acc + (item.p || this.state.newCourse.defaultPar);
+        });
+      } else {
+        total = this.state.newCourse.holes * this.state.newCourse.defaultPar
+      }
+      return 'Total Par: ' + total;
+    }
 
     handleBack = () => {
       this.props.history.push('/course');
@@ -32,125 +43,133 @@ class NewCourse extends Component {
     handleSave = (evt) => {
       evt.preventDefault();
 
-
-
     };
     handleFormChange = (evt) => {
+      evt.preventDefault();
+      if(evt.target.name === 'useHoleData') {
+        console.log(evt.target.checked)
+        this.setState({useHoleData: evt.target.checked})
+      } else {
+        let newCourse = Object.assign({}, this.state.newCourse, { [evt.target.name] : evt.target.value});
+        let newState = Object.assign({}, this.state, {newCourse: newCourse});
+        this.setState(newState);  
+      }
 
     };
 
 
-   stateList = {
-    "": "<Select One>",
-    "AL": "Alabama",
-    "AK": "Alaska",
-    "AS": "American Samoa",
-    "AZ": "Arizona",
-    "AR": "Arkansas",
-    "CA": "California",
-    "CO": "Colorado",
-    "CT": "Connecticut",
-    "DE": "Delaware",
-    "DC": "District Of Columbia",
-    "FM": "Federated States Of Micronesia",
-    "FL": "Florida",
-    "GA": "Georgia",
-    "GU": "Guam",
-    "HI": "Hawaii",
-    "ID": "Idaho",
-    "IL": "Illinois",
-    "IN": "Indiana",
-    "IA": "Iowa",
-    "KS": "Kansas",
-    "KY": "Kentucky",
-    "LA": "Louisiana",
-    "ME": "Maine",
-    "MH": "Marshall Islands",
-    "MD": "Maryland",
-    "MA": "Massachusetts",
-    "MI": "Michigan",
-    "MN": "Minnesota",
-    "MS": "Mississippi",
-    "MO": "Missouri",
-    "MT": "Montana",
-    "NE": "Nebraska",
-    "NV": "Nevada",
-    "NH": "New Hampshire",
-    "NJ": "New Jersey",
-    "NM": "New Mexico",
-    "NY": "New York",
-    "NC": "North Carolina",
-    "ND": "North Dakota",
-    "MP": "Northern Mariana Islands",
-    "OH": "Ohio",
-    "OK": "Oklahoma",
-    "OR": "Oregon",
-    "PW": "Palau",
-    "PA": "Pennsylvania",
-    "PR": "Puerto Rico",
-    "RI": "Rhode Island",
-    "SC": "South Carolina",
-    "SD": "South Dakota",
-    "TN": "Tennessee",
-    "TX": "Texas",
-    "UT": "Utah",
-    "VT": "Vermont",
-    "VI": "Virgin Islands",
-    "VA": "Virginia",
-    "WA": "Washington",
-    "WV": "West Virginia",
-    "WI": "Wisconsin",
-    "WY": "Wyoming"
-    };
-
-
-    stateOptions = () => {
+    stateOptionsList = () => {
       let output = [];
-      Object.keys(this.stateList).forEach((key) => 
-        output.push(<option value={key} key={key}>{this.stateList[key]}</option>)
+      Object.keys(constants.stateList).forEach((key) => 
+        output.push(<option value={key} key={key}>{constants.stateList[key]}</option>)
       )
       return output
+    }
+
+    holeDataList = () => {
+      if(!this.state.newCourse.holeData.length) {
+        return Array.from(Array(this.state.newCourse.holes).keys()).map(num =>
+          <tr><td>{num+1}</td><td>{this.state.newCourse.defaultPar}</td><td></td></tr>
+        )          
+      } else {
+        return this.state.newCourse.holeData.map((item, index) => 
+          <tr><td>{item.n || index}</td><td>{item.p || this.state.newCourse.defaultPar}</td><td>{item.d || ''}</td></tr>
+        )        
+      }
+
     }
 
 
 
   render() {
 
-console.log(this.stateOptions())
 
 
     return (
-      <div>
-        <Grid>
-          <Row>
-            <Col md={2}></Col>
-            <Col md={8}><h3>New Course</h3></Col>
-            <Col md={2} className="right-align">
-              <div className="add-player" onClick={this.handleAdd} title="Add Course"><Glyphicon glyph="plus-sign" /></div>
+      <div className="new-course">
+        <Form onSubmit={this.handleSave}>
+          <Grid>
+            <Row>
+              <Col md={12}><h3>New Course</h3></Col>  
+            </Row>
+            
+
+                <FormGroup controlId="name">
+                  <ControlLabel>Course Name</ControlLabel>
+                  <FormControl name="name" type="text" value={this.state.newCourse.name} onChange={this.handleFormChange} />
+                </FormGroup>
+
+            <Row>
+              <Col md={7}>
+                <FormGroup controlId="city">
+                  <ControlLabel>City</ControlLabel>
+                  <FormControl name="city" type="text" value={this.state.newCourse.city} onChange={this.handleFormChange} />
+                </FormGroup>  
               </Col>
-          </Row>
-          <Form onSubmit={this.handleSave}>
+              <Col md={5}>
 
-              <FormGroup controlId="name">
-                <ControlLabel>Course Name</ControlLabel>
-                <FormControl name="name" type="text" value={this.state.newCourse.name} onChange={this.handleFormChange} />
-              </FormGroup>
+                <FormGroup controlId="state">
+                  <ControlLabel>State</ControlLabel>
+                  <FormControl name="state" componentClass="select" value={this.state.newCourse.state} onChange={this.handleFormChange}>
+                    {this.stateOptionsList()}
+                  </FormControl>
+                </FormGroup>       
+              </Col>
 
-              <FormGroup controlId="city">
-                <ControlLabel>City</ControlLabel>
-                <FormControl name="city" type="text" value={this.state.newCourse.city} onChange={this.handleFormChange} />
-              </FormGroup>  
+            </Row>
 
-              <FormGroup controlId="state">
-                <ControlLabel>State</ControlLabel>
-                <FormControl name="state" componentClass="select" value={this.state.newCourse.state} onChange={this.handleFormChange}>
-                  {this.stateOptions()}
-                </FormControl>
-              </FormGroup>                            
+            <Row>
+              <Col md={4}>
+               <FormGroup controlId="holes">
+                  <ControlLabel>Holes</ControlLabel>
+                  <FormControl name="holes" type="number" value={this.state.newCourse.holes} onChange={this.handleFormChange} />
+                </FormGroup>               
+              </Col>
+              <Col md={4}>
+               <FormGroup controlId="par">
+                  <ControlLabel>Default Par</ControlLabel>
+                  <FormControl name="par" type="number" value={this.state.newCourse.defaultPar} onChange={this.handleFormChange} />
+                </FormGroup>  
+              </Col>
+              <Col md={4}>
+                  <div className="total-par">
+                    {this.totalPar()}
+                  </div>
+              </Col>
+            </Row>
+
+            <hr className="divider"></hr>
+
+            <div className="hole-data-inst">
+              Every hole will be the Default Par, or, you can enter individual values for each hole below.<br/><br/>
+              You can also enter hole values as you play a round.
+            </div>
 
 
-          </Form>
-        </Grid>
+            <Checkbox name="useHoleData" value={this.state.useHoleData} onChange={this.handleFormChange}>Use individual values</Checkbox>
+
+
+            {this.state.useHoleData && this.holeDataList && 
+
+              <div className="individual-values">
+                <table>
+                <tbody>
+                  <tr>
+                    <th>Hole</th>
+                    <th>Par</th>
+                    <th>Distance (ft.)</th>
+                  </tr>
+
+                  {this.holeDataList()}
+                  </tbody>
+                </table>
+              </div>
+            }
+
+
+            
+          </Grid>
+        </Form>
 
         <Grid className="fixed">
           <Row>
