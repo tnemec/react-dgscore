@@ -2,7 +2,9 @@
   
 }
 
-
+body {
+  background-color: #edf3f6 !important;
+}
 
 .home, .section {
   text-align: center;
@@ -81,7 +83,7 @@
   width: 100%;
   max-width: 720px;
   bottom: 0px;
-  background: #FFF;
+  background: rgba(255,255,255,0.8);
   border-top: 1px solid #AAA;
   overflow: hidden;
 }
@@ -469,3 +471,16 @@ Button {
   top: 5px;
   left: 5px;
 }
+
+.new-course {
+  padding-bottom: 84px;
+}
+
+.new-course .hole-data-values td {
+  padding-right: 12px;
+}
+
+.new-course .hole-data-values input {
+  max-width: 100px;
+}
+

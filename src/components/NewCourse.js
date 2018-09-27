@@ -20,9 +20,10 @@ class NewCourse extends Component {
         "defaultPar": 3,
         "notes": "",
         "holeData": []
-      }
+      },
+      useHoleData: false
     };
-  
+    this.handleFormChange = this.handleFormChange.bind(this);   
   }
 
     totalPar = () => {
@@ -45,18 +46,26 @@ class NewCourse extends Component {
 
     };
     handleFormChange = (evt) => {
-      evt.preventDefault();
+      
       if(evt.target.name === 'useHoleData') {
-        console.log(evt.target.checked)
         this.setState({useHoleData: evt.target.checked})
       } else {
-        let newCourse = Object.assign({}, this.state.newCourse, { [evt.target.name] : evt.target.value});
+        evt.preventDefault();
+        let newCourse = {};
+        if(evt.target.name.substr(0,2) === 'hn' || evt.target.name.substr(0,2) === 'hp'|| evt.target.name.substr(0,2) === 'hd') {
+          let holeData = this.state.newCourse.holeData.slice(0);
+          let thisHole = holeData[parseInt(evt.target.name.substr(2))] || {};
+          thisHole[evt.target.name.substr(1,1)] =  evt.target.value;
+          holeData[parseInt(evt.target.name.substr(2))] = thisHole;
+          newCourse = Object.assign({}, this.state.newCourse, { 'holeData' : holeData });
+        } else {
+          newCourse = Object.assign({}, this.state.newCourse, { [evt.target.name] : evt.target.value});
+        }
         let newState = Object.assign({}, this.state, {newCourse: newCourse});
-        this.setState(newState);  
+        this.setState(newState);          
       }
 
     };
-
 
     stateOptionsList = () => {
       let output = [];
@@ -66,14 +75,35 @@ class NewCourse extends Component {
       return output
     }
 
+    populateHoleData = (numHoles) => {
+      let holeData;
+      for(let i = 0; i < numHoles; i++) {
+        if(!this.state.newCourse.holeData[i]) {
+          // add hole if is is undefined
+          holeData[i] = {n:1+1,p:this.state.newCourse.defaultPar,d:''}
+        }
+      }
+      let newCourse = Object.assign({}, this.state.newCourse, { 'holeData' : holeData });
+      let newState = Object.assign({}, this.state, {newCourse: newCourse});
+      this.setState(newState);         
+    }
+
+    truncateHoles = (numHoles) => {
+
+    }
+
+    getUseHoleData = () => {
+      return this.state.useHoleData || this.state.newCourse.holeData.length
+    }
+
     holeDataList = () => {
       if(!this.state.newCourse.holeData.length) {
-        return Array.from(Array(this.state.newCourse.holes).keys()).map(num =>
-          <tr><td>{num+1}</td><td>{this.state.newCourse.defaultPar}</td><td></td></tr>
+        return Array.from(Array(this.state.newCourse.holes).keys()).map(index =>
+          <tr key={index}><td><FormControl name={'hn' + index} type="text" value={index+1} onChange={this.handleFormChange} /></td><td><FormControl name={'hp' + index} type="text" value={this.state.newCourse.defaultPar} onChange={this.handleFormChange} /></td><td><FormControl name={'hd' + index} type="text" value="" onChange={this.handleFormChange} /></td></tr>
         )          
       } else {
         return this.state.newCourse.holeData.map((item, index) => 
-          <tr><td>{item.n || index}</td><td>{item.p || this.state.newCourse.defaultPar}</td><td>{item.d || ''}</td></tr>
+          <tr><td><FormControl name={'hn' + index} type="text" value={item.n || index+1} onChange={this.handleFormChange} /></td><td><FormControl name={'hp' + index} type="text" value={item.p || this.state.newCourse.defaultPar} onChange={this.handleFormChange} /></td><td></td><td><FormControl name={'hd' + index} type="text" value={item.d || ''} onChange={this.handleFormChange} /></td></tr>
         )        
       }
 
@@ -141,17 +171,17 @@ class NewCourse extends Component {
             <hr className="divider"></hr>
 
             <div className="hole-data-inst">
-              Every hole will be the Default Par, or, you can enter individual values for each hole below.<br/><br/>
-              You can also enter hole values as you play a round.
+              <p>Every hole will use the Default Par, or, you can enter individual values for each hole below.</p>
+              <p>You can also enter hole data as you play a round.</p>
             </div>
 
 
-            <Checkbox name="useHoleData" value={this.state.useHoleData} onChange={this.handleFormChange}>Use individual values</Checkbox>
+            <Checkbox name="useHoleData" checked={this.getUseHoleData()} onChange={this.handleFormChange}>Use individual values</Checkbox>
 
 
-            {this.state.useHoleData && this.holeDataList && 
+            {this.getUseHoleData() && this.holeDataList && 
 
-              <div className="individual-values">
+              <div className="hole-data-values">
                 <table>
                 <tbody>
                   <tr>
