@@ -48,7 +48,9 @@ class NewCourse extends Component {
     handleFormChange = (evt) => {
       
       if(evt.target.name === 'useHoleData') {
-        this.setState({useHoleData: evt.target.checked})
+        this.setState({useHoleData: evt.target.checked}, () => {
+           this.populateHoleData()          
+        }); 
       } else {
         evt.preventDefault();
         let newCourse = {};
@@ -62,7 +64,9 @@ class NewCourse extends Component {
           newCourse = Object.assign({}, this.state.newCourse, { [evt.target.name] : evt.target.value});
         }
         let newState = Object.assign({}, this.state, {newCourse: newCourse});
-        this.setState(newState);          
+        this.setState(newState, () => {
+           this.populateHoleData()          
+        });   
       }
 
     };
@@ -75,12 +79,18 @@ class NewCourse extends Component {
       return output
     }
 
-    populateHoleData = (numHoles) => {
-      let holeData;
-      for(let i = 0; i < numHoles; i++) {
-        if(!this.state.newCourse.holeData[i]) {
-          // add hole if is is undefined
-          holeData[i] = {n:1+1,p:this.state.newCourse.defaultPar,d:''}
+    populateHoleData = () => {
+      // fills hole data with default values
+      // also truncates holes to the amount specified
+      let holeData = [];
+      if(this.state.useHoleData) {
+        holeData = this.state.newCourse.holeData.slice(0,this.state.newCourse.holes);
+        console.log(holeData)
+        for(let i = 0; i < this.state.newCourse.holes; i++) {
+          if(!holeData[i]) {
+            // add hole if is is undefined
+            holeData[i] = {n:i+1,p:this.state.newCourse.defaultPar,d:''}
+          }
         }
       }
       let newCourse = Object.assign({}, this.state.newCourse, { 'holeData' : holeData });
@@ -88,25 +98,10 @@ class NewCourse extends Component {
       this.setState(newState);         
     }
 
-    truncateHoles = (numHoles) => {
-
-    }
-
-    getUseHoleData = () => {
-      return this.state.useHoleData || this.state.newCourse.holeData.length
-    }
-
-    holeDataList = () => {
-      if(!this.state.newCourse.holeData.length) {
-        return Array.from(Array(this.state.newCourse.holes).keys()).map(index =>
-          <tr key={index}><td><FormControl name={'hn' + index} type="text" value={index+1} onChange={this.handleFormChange} /></td><td><FormControl name={'hp' + index} type="text" value={this.state.newCourse.defaultPar} onChange={this.handleFormChange} /></td><td><FormControl name={'hd' + index} type="text" value="" onChange={this.handleFormChange} /></td></tr>
-        )          
-      } else {
-        return this.state.newCourse.holeData.map((item, index) => 
-          <tr><td><FormControl name={'hn' + index} type="text" value={item.n || index+1} onChange={this.handleFormChange} /></td><td><FormControl name={'hp' + index} type="text" value={item.p || this.state.newCourse.defaultPar} onChange={this.handleFormChange} /></td><td></td><td><FormControl name={'hd' + index} type="text" value={item.d || ''} onChange={this.handleFormChange} /></td></tr>
+    holeDataList = (state) => {
+        return state.newCourse.holeData.map((item, index) => 
+          <tr key={index}><td><FormControl name={'hn' + index} type="text" value={item.n || index+1} onChange={this.handleFormChange} /></td><td><FormControl name={'hp' + index} type="text" value={item.p || state.newCourse.defaultPar} onChange={this.handleFormChange} /></td><td><FormControl name={'hd' + index} type="text" value={item.d || ''} onChange={this.handleFormChange} /></td></tr>
         )        
-      }
-
     }
 
 
@@ -156,9 +151,9 @@ class NewCourse extends Component {
                 </FormGroup>               
               </Col>
               <Col md={4}>
-               <FormGroup controlId="par">
+               <FormGroup controlId="defaultPar">
                   <ControlLabel>Default Par</ControlLabel>
-                  <FormControl name="par" type="number" value={this.state.newCourse.defaultPar} onChange={this.handleFormChange} />
+                  <FormControl name="defaultPar" type="number" value={this.state.newCourse.defaultPar} onChange={this.handleFormChange} />
                 </FormGroup>  
               </Col>
               <Col md={4}>
@@ -176,10 +171,10 @@ class NewCourse extends Component {
             </div>
 
 
-            <Checkbox name="useHoleData" checked={this.getUseHoleData()} onChange={this.handleFormChange}>Use individual values</Checkbox>
+            <Checkbox name="useHoleData" checked={this.state.useHoleData} onChange={this.handleFormChange}>Use individual values</Checkbox>
 
 
-            {this.getUseHoleData() && this.holeDataList && 
+            {this.state.useHoleData && this.holeDataList && 
 
               <div className="hole-data-values">
                 <table>
@@ -190,7 +185,7 @@ class NewCourse extends Component {
                     <th>Distance (ft.)</th>
                   </tr>
 
-                  {this.holeDataList()}
+                  {this.holeDataList(this.state)}
                   </tbody>
                 </table>
               </div>
