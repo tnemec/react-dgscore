@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { Button, Grid, Col, Row, ListGroup, ListGroupItem, Modal, Form, ControlLabel, FormGroup, FormControl, Glyphicon, Checkbox  } from 'react-bootstrap';
+import { Button, Grid, Col, Row, ListGroup, ListGroupItem, Modal, Form, ControlLabel, FormGroup, FormControl, Glyphicon, Checkbox, Alert  } from 'react-bootstrap';
 
 import localCourses from '../utilities/localCourses.js';
 
 import constants from '../utilities/constants.js';
 
+import uuid from 'uuid/v1';
 
 
 class NewCourse extends Component {
@@ -14,6 +15,7 @@ class NewCourse extends Component {
     this.state = {
       newCourse: {
         "name": "",
+        "uuid": uuid(),
         "state": "",
         "city": "",
         "holes": 18,
@@ -21,7 +23,8 @@ class NewCourse extends Component {
         "notes": "",
         "holeData": []
       },
-      useHoleData: false
+      useHoleData: false,
+      showError: false
     };
     this.handleFormChange = this.handleFormChange.bind(this);   
   }
@@ -41,10 +44,18 @@ class NewCourse extends Component {
     handleBack = () => {
       this.props.history.push('/course');
     };
-    handleSave = (evt) => {
-      evt.preventDefault();
 
+    handleSave = (evt) => {
+      let save = localCourses.saveCourse(this.state.newCourse);
+      if(! save.status) {
+        this.setState({showError: true})
+      } else {
+        this.props.select(this.state.newCourse);
+        this.props.history.push('/new');
+      }
     };
+
+
     handleFormChange = (evt) => {
       
       if(evt.target.name === 'useHoleData') {
@@ -57,18 +68,25 @@ class NewCourse extends Component {
         if(evt.target.name.substr(0,2) === 'hn' || evt.target.name.substr(0,2) === 'hp'|| evt.target.name.substr(0,2) === 'hd') {
           let holeData = this.state.newCourse.holeData.slice(0);
           let thisHole = holeData[parseInt(evt.target.name.substr(2))] || {};
-          thisHole[evt.target.name.substr(1,1)] =  evt.target.value;
+          let val = (evt.target.name.substr(0,2) === 'hp') ? parseInt(evt.target.value) : evt.target.value; // par is always int
+          val = (evt.target.name.substr(0,2) === 'hd') ? parseFloat(val) : val; // dist is float
+          thisHole[evt.target.name.substr(1,1)] = val ;
           holeData[parseInt(evt.target.name.substr(2))] = thisHole;
           newCourse = Object.assign({}, this.state.newCourse, { 'holeData' : holeData });
         } else {
-          newCourse = Object.assign({}, this.state.newCourse, { [evt.target.name] : evt.target.value});
+          let val = (evt.target.name === 'holes' || evt.target.name === 'defaultPar') ? parseInt(evt.target.value) : evt.target.value;
+          newCourse = Object.assign({}, this.state.newCourse, { [evt.target.name] : val});
         }
         let newState = Object.assign({}, this.state, {newCourse: newCourse});
         this.setState(newState, () => {
-           this.populateHoleData()          
+           //this.populateHoleData()
         });   
       }
 
+    };
+
+    handleFormBlur = () => {
+      this.populateHoleData()  ;
     };
 
     stateOptionsList = () => {
@@ -100,7 +118,7 @@ class NewCourse extends Component {
 
     holeDataList = (state) => {
         return state.newCourse.holeData.map((item, index) => 
-          <tr key={index}><td><FormControl name={'hn' + index} type="text" value={item.n || index+1} onChange={this.handleFormChange} /></td><td><FormControl name={'hp' + index} type="text" value={item.p || state.newCourse.defaultPar} onChange={this.handleFormChange} /></td><td><FormControl name={'hd' + index} type="text" value={item.d || ''} onChange={this.handleFormChange} /></td></tr>
+          <tr key={index}><td><FormControl name={'hn' + index} type="text" value={item.n || index+1} onChange={this.handleFormChange} /></td><td><FormControl name={'hp' + index} type="number" min="1" max="8" value={item.p || state.newCourse.defaultPar} onChange={this.handleFormChange} /></td><td><FormControl name={'hd' + index} type="number" value={item.d || ''} onChange={this.handleFormChange} /></td></tr>
         )        
     }
 
@@ -147,13 +165,13 @@ class NewCourse extends Component {
               <Col md={4}>
                <FormGroup controlId="holes">
                   <ControlLabel>Holes</ControlLabel>
-                  <FormControl name="holes" type="number" value={this.state.newCourse.holes} onChange={this.handleFormChange} />
+                  <FormControl name="holes" type="number" value={this.state.newCourse.holes} onChange={this.handleFormChange} onBlur={this.handleFormBlur} />
                 </FormGroup>               
               </Col>
               <Col md={4}>
                <FormGroup controlId="defaultPar">
                   <ControlLabel>Default Par</ControlLabel>
-                  <FormControl name="defaultPar" type="number" value={this.state.newCourse.defaultPar} onChange={this.handleFormChange} />
+                  <FormControl name="defaultPar" type="number" value={this.state.newCourse.defaultPar} onChange={this.handleFormChange} onBlur={this.handleFormBlur} />
                 </FormGroup>  
               </Col>
               <Col md={4}>
@@ -195,6 +213,13 @@ class NewCourse extends Component {
             
           </Grid>
         </Form>
+
+        {this.state.showError &&
+          <Alert bsStyle="danger">
+            <h4>Error Saving Course</h4>
+            <p>The course could not be saved to your local storage</p>
+          </Alert>
+        }
 
         <Grid className="fixed">
           <Row>

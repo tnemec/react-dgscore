@@ -41,19 +41,30 @@ const getCourseList = () => {
 
 const saveCourse = (course) => {
 	let savedCourses = getSavedCourses() || [];
+  course.name = (course.name.length) ? course.name : 'Untitled';
 	let newCourses = savedCourses.concat(course);
 	let status = false;
 	try {
 		window.localStorage.setItem('dg-score-saved-courses', JSON.stringify(newCourses));
 		status = true;
+    console.log('saved new course')
 	} catch(e) {
 		console.log('Failed to save course ' + e);
 	}
 	return {status: status, courses: getCourseList()}
 }
 
+const coursePar = (course) => {
+  if(course.holeData && course.holeData.length) {
+    return course.holeData.reduce( (tot, obj) => { return tot + (obj.p)}, 0)
+  } else {
+    return course.holes * course.defaultPar;
+  }
+}
+
 
 export default {
 	getCourseList,
-	saveCourse
+	saveCourse,
+  coursePar
 }

@@ -11,7 +11,7 @@ const CourseList = (props) => {
   let savedCourses = localCourses.getCourseList();
   if(Array.isArray(savedCourses)) {
     return savedCourses.map((item, index) => 
-      <ListGroupItem  key={item.uuid} onClick={() => props.handleSelectCourse(item)}>{item.name}</ListGroupItem>
+      <ListGroupItem  key={item.uuid} onClick={() => props.handleSelectCourse(item)}>{item.name} <i>({item.holes + ' holes, par ' + localCourses.coursePar(item)})</i></ListGroupItem>
     );
   }
   return null
