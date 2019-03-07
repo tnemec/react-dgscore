@@ -1,6 +1,7 @@
 
 
 const initialState = {
+	loadedState: false,
   	prefs: {
   		defaultPar: 3,
   		maxPlayers : 6,
@@ -26,16 +27,24 @@ const initialState = {
     	course: {},
     	players: []
     },
+    altRound : {
+    	course: {},
+    	players: []
+    },
     savedPlayers : [
+		{name: 'Tony', uid: 100, img: '', icon: ''},     
 		{name: 'Steve', uid: 101, img: '', icon: ''}, 
 		{name: 'Andrew', uid: 102, img: '', icon: ''}, 
 	]
 };
 
 
+
+
 export default (state = initialState, action) => {
   switch (action.type) {
     case 'RESTORE_STATE' : // restore state from localStorage
+    	action.payload.loadedState = true;
     	return action.payload
 
     case 'NEWROUND_PLAYERS': // replace newround.players array
@@ -59,7 +68,7 @@ export default (state = initialState, action) => {
 			}
 			player.scorecard = ar;
 		}    
-    	let round = Object.assign({}, state, {
+    	let round = Object.assign({}, state.round, {
     		course: state.newround.course,
     		players: players,
 			finished: false,
@@ -71,13 +80,54 @@ export default (state = initialState, action) => {
     	return Object.assign({}, state, { newround : newround, round: round });
     case 'VIEW_HOLE' : // changes the current hole
         const holeIndex = action.payload;
-        console.log(holeIndex)
         if(Number.isNaN(holeIndex)) {
-            round = Object.assign({}, state, {currentHole: 0})
+            round = Object.assign({}, state.round, {currentHole: 0})
         } else {
-            round = Object.assign({}, state, {currentHole: Math.max(0, Math.min(holeIndex, state.round.course.holes))})            
+            round = Object.assign({}, state.round, {currentHole: Math.max(0, Math.min(holeIndex, state.round.course.holes))})            
         }
         return Object.assign({}, state, { round: round });
+
+   case 'SET_STROKES' : 
+		players = state.round.players.map((player) => {
+			if(player.uid == action.payload.player) {
+				if(! player.scorecard) {
+					player.scorecard = []
+				}
+				if(! player.scorecard[action.payload.hole]) {
+					player.scorecard[action.payload.hole] = {s:0}
+				}
+				 player.scorecard[action.payload.hole].s = action.payload.strokes	
+			}
+			return player
+		});
+		round = Object.assign({}, state.round, {players: players});
+		return Object.assign({}, state, { round: round });
+
+	case 'SET_DEFAULT_STROKES' : 
+		let hole = action.payload;
+		players = state.round.players.map( (player) => {
+			if(player.scorecard[hole].s == 0) {
+				player.scorecard[hole].s = (state.round.course.par && state.round.course.par[hole]) || state.prefs.defaultPar;
+			}
+			return player
+		});
+		console.log(players)
+		let holesPlayed = state.round.holesPlayed.slice(0);
+		if(holesPlayed.indexOf(hole) == -1) {
+			holesPlayed.push(hole)
+		}
+		round = Object.assign({}, state.round, {players: players, holesPlayed: holesPlayed});
+		return Object.assign({}, state, { round: round });
+
+	case 'FINISH_ROUND' : 
+		round = Object.assign({}, state.round, {finished: true, finishTime: new Date()});
+		return Object.assign({}, state, { round: round });		
+
+	case 'LOAD_ALT_ROUND' : 
+		return Object.assign({}, state, { altRound: action.payload });	
+
+	case 'CLEAR_ALT_ROUND' : 
+		return Object.assign({}, state, { altRound: {course: {}, players: []} });	
 
     default:
     	return state

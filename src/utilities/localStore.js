@@ -9,22 +9,23 @@ class LocalStore extends Component {
   constructor(props) {
     super(props);
     this.state = {
-    	loaded: false
     };
+
+    let localState = window.localStorage.getItem('dg-score-rx-state');
+    if(localState && ! this.props.loaded) {
+      try {
+        console.log('load from local')
+        this.props.restoreState(JSON.parse(localState))     
+      } catch(e) {
+        console.log('Failed to load from localStorage: ' + e);
+        window.localStorage.removeItem('dg-score-rx-state');
+      }
+    }    
   }
 
 
   componentDidMount() {
-  	let localState = window.localStorage.getItem('dg-score-rx-state');
-  	if(localState && ! this.state.loaded) {
-  		try {
-        console.log('loaded from local')
-	    	this.props.restoreState(JSON.parse(localState))  		
-	    } catch(e) {
-	    	console.log('Failed to load from localStorage: ' + e)
-	    }
-  	}
-    this.setState({loaded: true});
+
 
   }
 
@@ -32,14 +33,12 @@ class LocalStore extends Component {
 
 	render() {
 
-		if(this.state.loaded) {
 			try {
 				window.localStorage.setItem('dg-score-rx-state', JSON.stringify(this.props.appState));
 				console.log('save to local')
 			} catch(e) {
 				console.log('Failed to save to localStorage: ' + e)
 			}
-		}
 
 
 		return null;
@@ -51,6 +50,7 @@ class LocalStore extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
+    loaded: state.loadedState,
     appState: state
   }
 };

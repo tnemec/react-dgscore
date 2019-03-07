@@ -1,17 +1,22 @@
 import React, { Component } from 'react';
-import { Button } from 'react-bootstrap';
+import { connect } from 'react-redux'
+import { Button, Grid, Col, Row, Glyphicon } from 'react-bootstrap';
+import moment from 'moment'
 
 
 
 const Previous = (props) => {
-	return (
-    <div className="section" v-if="inProgress">
-      <h4>Round in progress:</h4>
-      <p>{props.courseName}</p>
-      <p><Button onClick={props.resumeHandler} bsStyle="primary">Resume Round</Button></p>
+  if(props.round.started && ! props.round.finished) {
+  	return (
+      <div className="section" v-if="inProgress">
+        <h4>Round in progress:</h4>
+        <p>{props.courseName}</p>
+        <p><Button onClick={props.resumeHandler} bsStyle="primary">Resume Round</Button></p>
 
-    </div>
-	);
+      </div>
+  	)
+  }
+  return null
 }
 
 const NewRound = (props) => {
@@ -29,6 +34,7 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      prevRounds: [],
       round: {
       	course: {
       		name : 'Test Name'
@@ -37,22 +43,84 @@ class Home extends Component {
     };
 
   }
-
-    handleNewRound = () => {
-      this.props.history.push('/new');
+  componentDidMount() {
+    const history = this.getHistory();
+    if(history && history.length) {
+      // use last 5, sorted by latest first
+      this.setState({prevRounds: history.reverse().slice(0,5)});
     }
 
-    handleResume = () => {
-      this.props.history.push('/play');
+  };
+
+  handleNewRound = () => {
+    this.props.clearAlt();
+    this.props.history.push('/new');
+  };
+
+  handleResume = () => {
+    this.props.clearAlt();
+    this.props.history.push('/play/' + (this.props.round.currentHole -1));
+  };
+
+  formatDate = (str) => {
+    return moment(str).format('MMM Do, YYYY')
+  };
+
+  getHistory = () => {
+    if(window.localStorage && window.localStorage.dgScoreHistory) {
+      try {
+        return JSON.parse(window.localStorage.getItem('dgScoreHistory'))
+      } 
+      catch (e) {
+          console.log('Could not get history data from local storage')
+      }
     }
+    return undefined
+  };
+
+  loadAltRound = (index) => {
+    this.props.loadAlt(this.state.prevRounds[index]);
+    this.props.history.push('/scorecard/alt');
+  }
 
 
   render() {
+
+    const PrevRounds = () => {
+      if(this.state.prevRounds.length) {
+
+        const list = this.state.prevRounds.map( (item, index) => {
+          if(item) {
+            return (
+              <li key={item.startTime} onClick={() => this.loadAltRound(index)}>
+                <Grid><Row>
+                  <Col md={6}>{item.course.name}</Col>
+                  <Col md={6}>{this.formatDate(item.startTime)} <Glyphicon glyph="eye-open" /></Col>
+                  </Row></Grid>
+                </li>
+            )
+          }
+        });
+
+        return (
+          <div className="section">
+            <h4>Previous Rounds:</h4>
+            <ul className="prev-round-list">
+              {list}
+            </ul>
+          </div>
+        )
+      }
+      return null
+    }
+
     return (
   		<div className="home">
     		<h1>DG Score</h1>
 
-    		<Previous courseName={this.state.round.course.name} resumeHandler={this.handleResume}  />    
+    		<Previous round={this.props.round} courseName={this.props.round.course.name} resumeHandler={this.handleResume}  />  
+
+        <PrevRounds />  
 
     		<NewRound newRoundHandler={this.handleNewRound}/>		
     	</div>
@@ -61,5 +129,25 @@ class Home extends Component {
   }
 }
 
-export default Home;
+
+const mapStateToProps = (state, ownProps) => {
+  return {
+    round: state.round
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    loadAlt: (payload) => {
+      dispatch({type:'LOAD_ALT_ROUND', payload: payload});
+    },
+    clearAlt: (payload) => {
+      dispatch({type:'CLEAR_ALT_ROUND', payload: null});
+    }
+  }
+}
+
+
+export default connect(mapStateToProps,mapDispatchToProps)(Home);
+
 

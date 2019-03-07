@@ -2,13 +2,19 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { Button, Grid, Col, Row, ListGroup, ListGroupItem, Modal, Form, ControlLabel, FormGroup, FormControl, Glyphicon  } from 'react-bootstrap';
 
-import savedData from '../service/savedCourses.json'
+
+import localCourses from '../utilities/localCourses.js'
+
 
 
 const CourseList = (props) => {
-  return props.savedCourses.map((item, index) => 
-    <ListGroupItem  key={item.uuid} onClick={() => props.handleSelectCourse(item)}>{item.name}</ListGroupItem>
-  );
+  let savedCourses = localCourses.getCourseList();
+  if(Array.isArray(savedCourses)) {
+    return savedCourses.map((item, index) => 
+      <ListGroupItem  key={item.uuid} onClick={() => props.handleSelectCourse(item)}>{item.name} <i>({item.holes + ' holes, par ' + localCourses.coursePar(item)})</i></ListGroupItem>
+    );
+  }
+  return null
 }
 
 
@@ -25,12 +31,14 @@ class SelectCourse extends Component {
       this.props.history.push('/new');
     };
     handleAdd = () => {
-      this.props.history.push('/newCourse');
+      this.props.history.push('/addcourse');
     };
     handleSelectCourse = (course) => {
       this.props.select(course);
       this.props.history.push('/new');
     };
+
+
   
 
   render() {
@@ -69,7 +77,6 @@ class SelectCourse extends Component {
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    savedCourses: savedData.Items
   }
 };
 
